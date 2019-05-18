@@ -8,7 +8,7 @@ import Models = require("../../common/models");
 import Utils = require("../utils");
 import Interfaces = require("../interfaces");
 import Config = require("../config");
-var uuid = require('node-uuid');
+var uuid = require('uuid').uuidv4;
 
 export class NullOrderGateway implements Interfaces.IOrderEntryGateway {
     OrderUpdate = new Utils.Evt<Models.OrderStatusUpdate>();

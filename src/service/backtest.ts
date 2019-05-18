@@ -12,7 +12,7 @@ import Q = require("q");
 
 var shortId = require("shortid");
 var Deque = require("collections/deque");
-var uuid = require('node-uuid');
+var uuid = require('uuid').uuidv4;
 
 enum TimedType {
     Interval,

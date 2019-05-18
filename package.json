@@ -49,20 +49,24 @@
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "mongodb": "2.2.25",
-    "node-uuid": "1.4.8",
     "q": "1.5.0",
     "request": "^2.88.0",
     "shortid": "2.2.8",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
     "typescript": "^2.4.1",
+    "uuid": "^3.3.2",
     "ws": "^1.0.1"
   },
   "devDependencies": {
     "mocha": "^6.1.4"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "grunt compile",
+    "docker:start:mongo": "docker run -p 27017:27017 --name tribeca-mongo -d mongo",
+    "docker:start": "docker run -p 3000:3000 --link tribeca-mongo:mongo --env-file ./env --name tribeca -d tribeca",
+    "docker:stop": "docker stop mongo && docker stop tribeca"
   },
   "repository": {
     "type": "git",

@@ -13,7 +13,7 @@ import Q = require("q");
 import _ = require('lodash');
 import log from "../logging";
 
-var uuid = require('node-uuid');
+var uuid = require('uuid').uuidv4;
 import CoinbaseExchange = require("./coinbase-api");
 var SortedArrayMap = require("collections/sorted-array-map");
 
