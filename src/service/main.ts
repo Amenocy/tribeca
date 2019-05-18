@@ -114,7 +114,7 @@ const defaultActive : Models.SerializedQuotesActive = new Models.SerializedQuote
 const defaultQuotingParameters : Models.QuotingParameters = new Models.QuotingParameters(.3, .05, Models.QuotingMode.Top, 
     Models.FairValueModel.BBO, 3, .8, false, Models.AutoPositionMode.Off, false, 2.5, 300, .095, 2*.095, .095, 3, .1);
 
-const backTestSimulationSetup = (inputData : Array<Models.Market | Models.MarketTrade>, parameters : Backtest.BacktestParameters) : SimulationClasses => {
+const backTestSetup = (inputData : Array<Models.Market | Models.MarketTrade>, parameters : Backtest.BacktestParameters) : Container => {
     const timeProvider : Utils.ITimeProvider = new Backtest.BacktestTimeProvider(moment(_.first(inputData).time), moment(_.last(inputData).time));
     const exchange = Models.Exchange.Null;
     const gw = new Backtest.BacktestGateway(inputData, parameters.startingBasePosition, parameters.startingQuotePosition, <Backtest.BacktestTimeProvider>timeProvider);
@@ -147,7 +147,7 @@ const backTestSimulationSetup = (inputData : Array<Models.Market | Models.Market
     };
 };
 
-const liveTradingSetup = () : SimulationClasses => {
+const liveTradingSetup = () : Container => {
     const timeProvider : Utils.ITimeProvider = new Utils.RealTimeProvider();
     
     const app = express();
@@ -227,7 +227,7 @@ const liveTradingSetup = () : SimulationClasses => {
     };
 };
 
-interface SimulationClasses {
+interface Container {
     exchange: Models.Exchange;
     startingActive : Models.SerializedQuotesActive;
     startingParameters : Models.QuotingParameters;
@@ -239,8 +239,8 @@ interface SimulationClasses {
     getPublisher<T>(topic: string, persister?: Persister.ILoadAll<T>): Messaging.IPublish<T>;
 }
 
-const runTradingSystem = async (classes: SimulationClasses) : Promise<void> => {
-    const getPersister = classes.getPersister;
+const runLiveTrading = async (onion: Container) : Promise<void> => {
+    const getPersister = onion.getPersister;
     const orderPersister = await getPersister<Models.OrderStatusReport>("osr");
     const tradesPersister = await getPersister<Models.Trade>("trades");
     const fairValuePersister = await getPersister<Models.FairValue>("fv");
@@ -252,10 +252,10 @@ const runTradingSystem = async (classes: SimulationClasses) : Promise<void> => {
     const tsvPersister = await getPersister<Models.TradeSafety>("tsv");
     const marketDataPersister = await getPersister<Models.Market>(Messaging.Topics.MarketData);
     
-    const activePersister = await classes.getRepository<Models.SerializedQuotesActive>(classes.startingActive, Messaging.Topics.ActiveChange);
-    const paramsPersister = await classes.getRepository<Models.QuotingParameters>(classes.startingParameters, Messaging.Topics.QuotingParametersChange);
+    const activePersister = await onion.getRepository<Models.SerializedQuotesActive>(onion.startingActive, Messaging.Topics.ActiveChange);
+    const paramsPersister = await onion.getRepository<Models.QuotingParameters>(onion.startingParameters, Messaging.Topics.QuotingParametersChange);
     
-    const exchange = classes.exchange;
+    const exchange = onion.exchange;
 
     const shouldPublishAllOrders = !config.Has("ShowAllOrders") || config.GetBoolean("ShowAllOrders");
     const ordersFilter = shouldPublishAllOrders ? {} : {source: {$gte: Models.OrderSource.OrderTicket}};
@@ -275,10 +275,10 @@ const runTradingSystem = async (classes: SimulationClasses) : Promise<void> => {
     _.defaults(initActive, defaultActive);
 
     const orderCache = new Broker.OrderStateCache();
-    const timeProvider = classes.timeProvider;
-    const getPublisher = classes.getPublisher;
+    const timeProvider = onion.timeProvider;
+    const getPublisher = onion.getPublisher;
 
-    const gateway = await classes.getExch(orderCache);        
+    const gateway = await onion.getExch(orderCache);
     
     const advert = new Models.ProductAdvertisement(exchange, pair, config.GetString("TRIBECA_MODE"), gateway.base.minTickIncrement);
     getPublisher(Messaging.Topics.ProductAdvertisement).registerSnapshot(() => [advert]).publish(advert);
@@ -301,7 +301,7 @@ const runTradingSystem = async (classes: SimulationClasses) : Promise<void> => {
     const messages = new Messages.MessagesPubisher(timeProvider, messagesPersister, initMsgs, messagesPublisher);
     messages.publish("start up");
 
-    const getReceiver = classes.getReceiver;
+    const getReceiver = onion.getReceiver;
     const activeReceiver = getReceiver<boolean>(Messaging.Topics.ActiveChange);
     const quotingParametersReceiver = getReceiver<Models.QuotingParameters>(Messaging.Topics.QuotingParametersChange);
     const submitOrderReceiver = getReceiver<Models.OrderRequestFromUI>(Messaging.Topics.SubmitNewOrder);
@@ -404,45 +404,43 @@ const runTradingSystem = async (classes: SimulationClasses) : Promise<void> => {
     }, interval).unref();
 };
 
-const harness = async () : Promise<any> => {
-    if (config.inBacktestMode) {
-        console.log("enter backtest mode");
+const runBacktest = async (): Promise<void> => {
+    console.log("enter backtest mode");
         
-        const getFromBacktestServer = (ep: string) : Promise<any> => {
-            return new Promise((resolve, reject) => {
-                request.get(serverUrl+"/"+ep, (err, resp, body) => { 
-                    if (err) reject(err);
-                    else resolve(body);
-                });
+    const getFromBacktestServer = (ep: string) : Promise<any> => {
+        return new Promise((resolve, reject) => {
+            request.get(serverUrl+"/"+ep, (err, resp, body) => { 
+                if (err) reject(err);
+                else resolve(body);
             });
-        };
-
-        const input = await getFromBacktestServer("inputData").then(body => {
-            const inp : Array<Models.Market | Models.MarketTrade> = (typeof body ==="string") ? eval(body) : body;
-            
-            for (let i = 0; i < inp.length; i++) {
-                const d = inp[i];
-                d.time = new Date(d.time);
-            }
-            
-            return inp;
         });
+    };
 
-        const nextParameters = () : Promise<Backtest.BacktestParameters> => getFromBacktestServer("nextParameters").then(body => {
-            const p = (typeof body ==="string") ? <string|Backtest.BacktestParameters>JSON.parse(body) : body;
-            console.log("Recv'd parameters", util.inspect(p));
-            return (typeof p === "string") ? null : p;
-        });
-
-        while (true) {
-            const next = await nextParameters();
-            if (!next) break;
-            runTradingSystem(backTestSimulationSetup(input, next));
+    const input = await getFromBacktestServer("inputData").then(body => {
+        const inp : Array<Models.Market | Models.MarketTrade> = (typeof body ==="string") ? eval(body) : body;
+        
+        for (let i = 0; i < inp.length; i++) {
+            const d = inp[i];
+            d.time = new Date(d.time);
         }
+        
+        return inp;
+    });
+
+    const nextParameters = () : Promise<Backtest.BacktestParameters> => getFromBacktestServer("nextParameters").then(body => {
+        const p = (typeof body ==="string") ? <string|Backtest.BacktestParameters>JSON.parse(body) : body;
+        console.log("Recv'd parameters", util.inspect(p));
+        return (typeof p === "string") ? null : p;
+    });
+
+    while (true) {
+        const next = await nextParameters();
+        if (!next) break;
+        runLiveTrading(backTestSetup(input, next));
     }
-    else {
-        return runTradingSystem(liveTradingSetup());
-    }
-};
+}
+
+const harness = async () : Promise<any> =>
+    config.inBacktestMode ? runBacktest() : runLiveTrading(liveTradingSetup());
 
 harness();
