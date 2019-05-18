@@ -16,8 +16,6 @@ import WebSocket = require('ws');
 
 const coinbaseLog = log("tribeca:gateway:coinbase-api");
 
-const keepaliveAgent = new HttpsAgent();
-
 export class PublicClient {
     constructor(public apiURI: string) {
         coinbaseLog.info("starting coinbase public client, apiURI = ", apiURI);
@@ -49,19 +47,16 @@ export class PublicClient {
         };
     };
 
-    public request(method, uriParts, opts, callback?) {
-        opts = opts || {};
-        if (!callback && (opts instanceof Function)) {
-            callback = opts;
-            opts = {};
-        }
+    public request(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uriParts: (string | number)[],
+        opts: (request.UriOptions & request.CoreOptions) | (request.UrlOptions & request.CoreOptions), callback?: Function) {
+
         _.assign(opts, {
             'method': method.toUpperCase(),
             'uri': this.makeAbsoluteURI(this.makeRelativeURI(uriParts)),
             'json': true,
         });
         this.addHeaders(opts, {});
-        opts.agent = keepaliveAgent;
+        opts.agent = new HttpsAgent();
         request(opts, this.makeRequestCallback(callback));
     };
 
@@ -69,13 +64,13 @@ export class PublicClient {
         return this.request('GET', ['products'], callback);
     };
 
-    public getProductOrderBook(productID, level, callback) {
+    public getProductOrderBook(productID: number, level, callback) {
         if (!callback && (level instanceof Function)) {
             callback = level;
             level = null;
         }
         var opts = level && { 'qs': { 'level': level } };
-        return this.request('GET', ['products', productID, 'book'], opts, callback);
+        return this.request('GET', ['products', productID, 'book'], opts as any, callback);
     };
 
     public getProductTicker(productID, callback) {
@@ -108,13 +103,8 @@ export class AuthenticatedClient extends PublicClient {
         super(apiURI);
     }
 
-    public request(method, uriParts, opts, callback?) {
-        opts = opts || {};
-        method = method.toUpperCase();
-        if (!callback && (opts instanceof Function)) {
-            callback = opts;
-            opts = {};
-        }
+    public request(method: 'GET' | 'POST' | 'PUT' | 'DELETE', uriParts: (string | number)[],
+        opts: (request.UriOptions & request.CoreOptions) | (request.UrlOptions & request.CoreOptions), callback?: Function) {
         var relativeURI = this.makeRelativeURI(uriParts);
         _.assign(opts, {
             'method': method,
@@ -123,7 +113,6 @@ export class AuthenticatedClient extends PublicClient {
         if (opts.body && (typeof opts.body !== 'string')) {
             opts.body = JSON.stringify(opts.body);
         }
-        opts.agent = keepaliveAgent;
         var timestamp = Date.now() / 1000;
         var what = timestamp + method + relativeURI + (opts.body || '');
         var key = new Buffer(this.b64secret, 'base64');
@@ -161,7 +150,7 @@ export class AuthenticatedClient extends PublicClient {
             }
         });
         var opts = { 'body': params };
-        return this.request('POST', ['orders'], opts, callback);
+        return this.request('POST', ['orders'], opts as any, callback);
     };
 
     public buy(params, callback) {
@@ -204,14 +193,9 @@ export class AuthenticatedClient extends PublicClient {
         return this._transferFunds(params, callback);
     };
 
-    public _transferFunds(params, callback) {
-        _.forEach(['type', 'amount', 'coinbase_account_id'], function(param) {
-            if (params[param] === undefined) {
-                throw new Error("`opts` must include param `" + param + "`");
-            }
-        });
+    public _transferFunds(params: { type, amount, coinbase_account_id } | string, callback: Function) {
         var opts = { 'body': params };
-        return this.request('POST', ['transfers'], opts, callback);
+        return this.request('POST', ['transfers'], opts as any, callback);
     };
 
 };
