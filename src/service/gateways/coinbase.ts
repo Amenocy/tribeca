@@ -4,16 +4,11 @@
 ///<reference path="../interfaces.ts"/>
 
 import Config = require("../config");
-import request = require('request');
-import url = require("url");
-import querystring = require("querystring");
 import NullGateway = require("./nullgw");
 import Models = require("../../common/models");
 import Utils = require("../utils");
 import Interfaces = require("../interfaces");
-import io = require("socket.io-client");
 import moment = require("moment");
-import WebSocket = require('ws');
 import Q = require("q");
 import _ = require('lodash');
 import log from "../logging";

@@ -14,8 +14,6 @@ import Models = require("../../common/models");
 import Utils = require("../utils");
 import Interfaces = require("../interfaces");
 import io = require("socket.io-client");
-import moment = require("moment");
-import util = require("util");
 import * as Q from "q";
 import log from "../logging";
 const shortId = require("shortid");

@@ -6,10 +6,7 @@
 
 import angular = require("angular");
 import Models = require("../common/models");
-import io = require("socket.io-client");
-import moment = require("moment");
 import Messaging = require("../common/messaging");
-import Pair = require("./pair");
 import Shared = require("./shared_directives");
 
 interface PositionScope extends ng.IScope {
