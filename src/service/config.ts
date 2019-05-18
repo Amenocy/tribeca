@@ -53,7 +53,7 @@ export class ConfigProvider implements IConfigProvider {
         else if (this._config.hasOwnProperty(configKey))
             value = this._config[configKey];
         else if (throwIfMissing)
-            throw Error("Config does not have property " + configKey);
+            throw new Error("Config does not have property " + configKey);
 
         const fetched = cvt(value);
         ConfigProvider.Log.info("%s = %s", configKey, fetched);

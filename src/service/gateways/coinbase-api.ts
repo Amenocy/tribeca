@@ -157,7 +157,7 @@ export class AuthenticatedClient extends PublicClient {
     public _placeOrder(params, callback) {
         _.forEach(['size', 'side', 'product_id'], function(param) {
             if (params[param] === undefined) {
-                throw "`opts` must include param `" + param + "`";
+                throw new Error("`opts` must include param `" + param + "`");
             }
         });
         var opts = { 'body': params };
@@ -207,7 +207,7 @@ export class AuthenticatedClient extends PublicClient {
     public _transferFunds(params, callback) {
         _.forEach(['type', 'amount', 'coinbase_account_id'], function(param) {
             if (params[param] === undefined) {
-                throw "`opts` must include param `" + param + "`";
+                throw new Error("`opts` must include param `" + param + "`");
             }
         });
         var opts = { 'body': params };
@@ -259,7 +259,7 @@ export class OrderBook extends EventEmitter {
 
     public disconnect() {
         if (!this.socket) {
-            throw Error("Could not disconnect (not connected)");
+            throw new Error("Could not disconnect (not connected)");
         }
         this.socket.close();
         this.onClose();
@@ -270,7 +270,7 @@ export class OrderBook extends EventEmitter {
         this.state = stateName as unknown as string;
 
         if (this.fail_count > 3)
-            throw Error("Tried to reconnect 4 times. Giving up.");
+            throw new Error("Tried to reconnect 4 times. Giving up.");
 
         if (stateName === STATES.error || stateName === STATES.closed) {
             this.fail_count += 1;

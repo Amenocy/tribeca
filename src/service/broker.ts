@@ -316,7 +316,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
     };
 
     private shouldPublish = (o: Models.OrderStatusReport) : boolean => {
-        if (o.source === null) throw Error(JSON.stringify(o));
+        if (o.source === null) throw new Error(JSON.stringify(o));
         if (this._publishAllOrders) return true;
 
         switch (o.source) {
