@@ -1,8 +1,6 @@
 import * as ws from "ws";
-import * as Util from "./utils";
 import * as Models from "../common/models";
 import * as bunyan from "bunyan";
-import * as moment from "moment";
 import log from "./logging";
 
 export default class WebSocket {

@@ -58,8 +58,10 @@ export class MarketTrade implements ITimestamped {
                 public make_side: Side) {}
 }
 
-export enum Currency { 
+export enum Currency {
     USD, 
+    USDC,
+    USDT,
     BTC, 
     LTC, 
     EUR, 
@@ -83,7 +85,8 @@ export enum Currency {
     STEEM, 
     XDN, 
     XEM, 
-    XMR, 
+    XMR,
+    XRP,
     ARDR, 
     WAVES, 
     BTU, 

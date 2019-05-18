@@ -8,7 +8,6 @@ import Utils = require("./utils");
 import _ = require("lodash");
 import Interfaces = require("./interfaces");
 import Persister = require("./persister");
-import util = require("util");
 import Models = require("../common/models");
 
 export class MessagesPubisher implements Interfaces.IPublishMessages {

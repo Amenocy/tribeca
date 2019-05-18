@@ -8,7 +8,6 @@ import Utils = require("../utils");
 import _ = require('lodash');
 import request = require('request');
 import Models = require("../../common/models");
-import moment = require("moment");
 import log from "../logging";
 
 var HttpsAgent = require('agentkeepalive').HttpsAgent;

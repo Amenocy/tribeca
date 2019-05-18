@@ -1,10 +1,7 @@
 import Models = require("../common/models");
 import moment = require('moment');
-import events = require("events");
-import util = require("util");
 import _ = require("lodash");
 import * as request from "request";
-import * as Q from "q";
 
 require('events').EventEmitter.prototype._maxListeners = 100;
 

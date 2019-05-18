@@ -19,7 +19,6 @@
 /// <reference path="web.ts"/>
 
 import _ = require("lodash");
-import Q = require("q");
 import path = require("path");
 import express = require('express');
 import util = require('util');

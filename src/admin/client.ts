@@ -13,12 +13,7 @@
 (<any>global).jQuery = require("jquery");
 import angular = require("angular");
 
-var ui_bootstrap = require("angular-ui-bootstrap");
-var ngGrid = require("../ui-grid.min");
-var bootstrap = require("../bootstrap.min");
-
 import Models = require("../common/models");
-import moment = require("moment");
 import OrderList = require("./orderlist");
 import Trades = require("./trades");
 import Messaging = require("../common/messaging");

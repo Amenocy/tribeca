@@ -4,7 +4,6 @@
 
 import Utils = require("./utils");
 import Models = require("../common/models");
-import Messaging = require("../common/messaging");
 import q = require("q");
 
 export interface IExchangeDetailsGateway {

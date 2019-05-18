@@ -14,8 +14,6 @@ import Interfaces = require("./interfaces");
 import _ = require("lodash");
 import P = require("./persister");
 import Broker = require("./broker");
-import mongodb = require('mongodb');
-import Web = require("./web");
 import QuotingEngine = require("./quoting-engine");
 import * as moment from "moment";
 import log from "./logging";

@@ -5,8 +5,6 @@
 /// <reference path="../common/messaging.ts" />
 ///<reference path="persister.ts"/>
 
-import util = require("util");
-import Config = require("./config");
 import Models = require("../common/models");
 import Utils = require("./utils");
 import Interfaces = require("./interfaces");

@@ -15,7 +15,6 @@ import Models = require("../../common/models");
 import Utils = require("../utils");
 import util = require("util");
 import Interfaces = require("../interfaces");
-import moment = require("moment");
 import _ = require("lodash");
 import log from "../logging";
 var shortId = require("shortid");

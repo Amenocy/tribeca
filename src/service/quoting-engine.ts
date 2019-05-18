@@ -13,17 +13,11 @@
 /// <reference path="position-management.ts"/>
 /// <reference path="./quoting-styles/style-registry.ts"/>
 
-import Config = require("./config");
 import Models = require("../common/models");
 import Messaging = require("../common/messaging");
 import Utils = require("./utils");
 import Interfaces = require("./interfaces");
-import Quoter = require("./quoter");
 import Safety = require("./safety");
-import util = require("util");
-import _ = require("lodash");
-import Statistics = require("./statistics");
-import Active = require("./active-state");
 import FairValue = require("./fair-value");
 import MarketFiltration = require("./market-filtration");
 import QuotingParameters = require("./quoting-parameters");
