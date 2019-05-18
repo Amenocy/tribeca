@@ -91,7 +91,7 @@ interface CoinbaseEntry {
     id: string;
 }
 
-interface CoinbaseBookStorage {
+export interface CoinbaseBookStorage {
     sequence: string;
     bids: { [id: string]: CoinbaseEntry };
     asks: { [id: string]: CoinbaseEntry };
@@ -844,11 +844,11 @@ class Coinbase extends Interfaces.CombinedGateway {
 };
 
 export async function createCoinbase(config: Config.IConfigProvider, orders: Interfaces.IOrderStateCache, timeProvider: Utils.ITimeProvider, pair: Models.CurrencyPair) : Promise<Interfaces.CombinedGateway> {
-    const authClient : CoinbaseAuthenticatedClient = new CoinbaseExchange.AuthenticatedClient(config.GetString("CoinbaseApiKey"),
+    const client : CoinbaseAuthenticatedClient = new CoinbaseExchange.AuthenticatedClient(config.GetString("CoinbaseApiKey"),
             config.GetString("CoinbaseSecret"), config.GetString("CoinbasePassphrase"), config.GetString("CoinbaseRestUrl"));
     
     const d = Q.defer<Product[]>();
-    authClient.getProducts((err, _, p) => {
+    client.getProducts((err, _, p) => {
         if (err) d.reject(err);
         else d.resolve(p);
     });
@@ -858,7 +858,7 @@ export async function createCoinbase(config: Config.IConfigProvider, orders: Int
     
     for (let p of products) {
         if (p.id === symbolProvider.symbol) 
-            return new Coinbase(authClient, config, orders, timeProvider, symbolProvider, parseFloat(p.quote_increment));
+            return new Coinbase(client, config, orders, timeProvider, symbolProvider, parseFloat(p.quote_increment));
     }
 
     throw new Error("unable to match pair to a coinbase symbol " + pair.toString());
