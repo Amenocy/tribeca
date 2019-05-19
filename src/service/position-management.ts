@@ -1,12 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="config.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="statistics.ts"/>
-/// <reference path="persister.ts"/>
-/// <reference path="fair-value.ts"/>
-/// <reference path="interfaces.ts"/>
-/// <reference path="quoting-parameters.ts"/>
 
 import Models = require("../common/models");
 import Messaging = require("../common/messaging");
@@ -122,7 +113,7 @@ export class TargetBasePositionManager {
 // performs an action every duration apart, even across new instances
 export class RegularTimer {
     constructor(
-        private _timeProvider : Utils.ITimeProvider,
+        private _timeProvider: Utils.ITimeProvider,
         private _action: () => void,
         private _diffTime: moment.Duration,
         lastTime: moment.Moment) {

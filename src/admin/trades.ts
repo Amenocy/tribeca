@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="shared_directives.ts"/>
-
 import angular = require("angular");
 import Models = require("../common/models");
 import moment = require("moment");
@@ -8,22 +5,22 @@ import Messaging = require("../common/messaging");
 import Shared = require("./shared_directives");
 
 interface TradesScope extends ng.IScope {
-    trade_statuses : DisplayTrade[];
-    exch : Models.Exchange;
-    pair : Models.CurrencyPair;
-    gridOptions : any;
+    trade_statuses: DisplayTrade[];
+    exch: Models.Exchange;
+    pair: Models.CurrencyPair;
+    gridOptions: any;
 }
 
 class DisplayTrade {
-    tradeId : string;
-    time : moment.Moment;
-    price : number;
-    quantity : number;
-    side : string;
-    value : number;
-    liquidity : string;
+    tradeId: string;
+    time: moment.Moment;
+    price: number;
+    quantity: number;
+    side: string;
+    value: number;
+    liquidity: string;
 
-    constructor(public trade : Models.Trade) {
+    constructor(public trade: Models.Trade) {
         this.tradeId = trade.tradeId;
         this.side = trade.side === Models.Side.Ask ? "S" : "B";
         this.time = (moment.isMoment(trade.time) ? trade.time : moment(trade.time));
@@ -40,7 +37,7 @@ class DisplayTrade {
     }
 }
 
-var TradesListController = ($scope : TradesScope, $log : ng.ILogService, subscriberFactory : Shared.SubscriberFactory, uiGridConstants: any) => {
+var TradesListController = ($scope: TradesScope, $log: ng.ILogService, subscriberFactory: Shared.SubscriberFactory, uiGridConstants: any) => {
     $scope.trade_statuses = [];
     $scope.gridOptions = {
         data: 'trade_statuses',
@@ -87,7 +84,7 @@ var TradesListController = ($scope : TradesScope, $log : ng.ILogService, subscri
     $log.info("started trades list");
 };
 
-var tradeList = () : ng.IDirective => {
+var tradeList = (): ng.IDirective => {
     var template = '<div><div ui-grid="gridOptions" ui-grid-grouping class="table table-striped table-hover table-condensed" style="height: 553px" ></div></div>';
 
     return {
@@ -97,8 +94,8 @@ var tradeList = () : ng.IDirective => {
         transclude: false,
         controller: TradesListController,
         scope: {
-          exch: '=',
-          pair: '='
+            exch: '=',
+            pair: '='
         }
     }
 };
@@ -106,4 +103,4 @@ var tradeList = () : ng.IDirective => {
 export var tradeListDirective = "tradeListDirective";
 
 angular.module(tradeListDirective, ['ui.bootstrap', 'ui.grid', "ui.grid.grouping", Shared.sharedDirectives])
-       .directive("tradeList", tradeList);
+    .directive("tradeList", tradeList);

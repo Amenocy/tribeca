@@ -1,17 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="config.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="interfaces.ts"/>
-/// <reference path="quoter.ts"/>
-/// <reference path="safety.ts"/>
-/// <reference path="statistics.ts"/>
-/// <reference path="active-state.ts"/>
-/// <reference path="fair-value.ts"/>
-/// <reference path="market-filtration.ts"/>
-/// <reference path="quoting-parameters.ts"/>
-/// <reference path="position-management.ts"/>
-/// <reference path="./quoting-styles/style-registry.ts"/>
 
 import Models = require("../common/models");
 import Messaging = require("../common/messaging");
@@ -118,10 +104,10 @@ export class QuotingEngine {
         }
         
         if (params.mode === Models.QuotingMode.PingPong) {
-          if (unrounded.askSz && safety.buyPing && unrounded.askPx < safety.buyPing + params.width)
-            unrounded.askPx = safety.buyPing + params.width;
-          if (unrounded.bidSz && safety.sellPong && unrounded.bidPx > safety.sellPong - params.width)
-            unrounded.bidPx = safety.sellPong - params.width;
+            if (unrounded.askSz && safety.buyPing && unrounded.askPx < safety.buyPing + params.width)
+                unrounded.askPx = safety.buyPing + params.width;
+            if (unrounded.bidSz && safety.sellPong && unrounded.bidPx > safety.sellPong - params.width)
+                unrounded.bidPx = safety.sellPong - params.width;
         }
         
         if (safety.sell > params.tradesPerMinute) {
@@ -180,13 +166,13 @@ export class QuotingEngine {
             this.quotesAreSame(new Models.Quote(genQt.bidPx, genQt.bidSz), this.latestQuote, Models.Side.Bid),
             this.quotesAreSame(new Models.Quote(genQt.askPx, genQt.askSz), this.latestQuote, Models.Side.Ask),
             t
-            );
+        );
     };
 
     private quotesAreSame(
-            newQ: Models.Quote, 
-            prevTwoSided: Models.TwoSidedQuote, 
-            side: Models.Side): Models.Quote {
+        newQ: Models.Quote, 
+        prevTwoSided: Models.TwoSidedQuote, 
+        side: Models.Side): Models.Quote {
                 
         if (newQ.price === null && newQ.size === null) return null;
         if (prevTwoSided == null) return newQ;
@@ -213,7 +199,7 @@ export class QuotingEngine {
     }
 }
 
-const quoteChanged = (o: Models.Quote, n: Models.Quote, tick: number) : boolean => { 
+const quoteChanged = (o: Models.Quote, n: Models.Quote, tick: number): boolean => { 
     if ((!o && n) || (o && !n)) return true;
     if (!o && !n) return false;
 
@@ -227,7 +213,7 @@ const quoteChanged = (o: Models.Quote, n: Models.Quote, tick: number) : boolean 
     return Math.abs(oSz - nSz) > .001;
 }
 
-const quotesChanged = (o: Models.TwoSidedQuote, n: Models.TwoSidedQuote, tick: number) : boolean => {
+const quotesChanged = (o: Models.TwoSidedQuote, n: Models.TwoSidedQuote, tick: number): boolean => {
     if ((!o && n) || (o && !n)) return true;
     if (!o && !n) return false;
 

@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "rootDir": "src/service",
+        "sourceMap": true,
+        "removeComments": false,
+        "declaration": false,
+        "outDir": "tribeca",
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

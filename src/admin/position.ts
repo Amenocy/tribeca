@@ -1,8 +1,4 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
 /// <amd-dependency path="ui.bootstrap"/>
-/// <reference path="shared_directives.ts"/>
-///<reference path="pair.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -10,18 +6,18 @@ import Messaging = require("../common/messaging");
 import Shared = require("./shared_directives");
 
 interface PositionScope extends ng.IScope {
-    baseCurrency : string;
-    basePosition : string;
-    quoteCurrency : string;
-    quotePosition : string;
-    baseHeldPosition : string;
-    quoteHeldPosition : string;
-    value : string;
-    quoteValue : string;
+    baseCurrency: string;
+    basePosition: string;
+    quoteCurrency: string;
+    quotePosition: string;
+    baseHeldPosition: string;
+    quoteHeldPosition: string;
+    value: string;
+    quoteValue: string;
 }
 
-var PositionController = ($scope : PositionScope, $log : ng.ILogService, subscriberFactory : Shared.SubscriberFactory, product: Shared.ProductState) => {
-    const toAmt = (a: number) : string => a.toFixed(product.fixed+1);
+var PositionController = ($scope: PositionScope, $log: ng.ILogService, subscriberFactory: Shared.SubscriberFactory, product: Shared.ProductState) => {
+    const toAmt = (a: number): string => a.toFixed(product.fixed+1);
     
     var clearPosition = () => {
         $scope.baseCurrency = null;
@@ -34,7 +30,7 @@ var PositionController = ($scope : PositionScope, $log : ng.ILogService, subscri
         $scope.quoteValue = null;
     };
 
-    var updatePosition = (position : Models.PositionReport) => {
+    var updatePosition = (position: Models.PositionReport) => {
         $scope.baseCurrency = Models.Currency[position.pair.base];
         $scope.quoteCurrency = Models.Currency[position.pair.quote];
         $scope.basePosition = toAmt(position.baseAmount);
@@ -69,7 +65,7 @@ angular
             templateUrl: "positions.html",
             controller: PositionController,
             scope: {
-              exch: '='
+                exch: '='
             }
-          }
+        }
     });

@@ -1,12 +1,11 @@
-/// <reference path="../../common/models.ts" />
  
- import StyleHelpers = require("./helpers");
- import Models = require("../../common/models");
+import StyleHelpers = require("./helpers");
+import Models = require("../../common/models");
 
 export class DepthQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.Depth;
     
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         const depth = input.params.width;
         const size = input.params.size;
         
@@ -34,6 +33,6 @@ export class DepthQuoteStyle implements StyleHelpers.QuoteStyle {
             }
         }
      
-         return new StyleHelpers.GeneratedQuote(bidPx, size, askPx, size);
-     };
+        return new StyleHelpers.GeneratedQuote(bidPx, size, askPx, size);
+    };
 };

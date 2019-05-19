@@ -7,11 +7,11 @@ require('events').EventEmitter.prototype._maxListeners = 100;
 
 export const date = () => new Date();
 
-export function fastDiff(x: Date, y: Date) : number {
+export function fastDiff(x: Date, y: Date): number {
     return x.getTime() - y.getTime();
 }
 
-export function timeOrDefault(x: Models.ITimestamped, timeProvider : ITimeProvider): Date {
+export function timeOrDefault(x: Models.ITimestamped, timeProvider: ITimeProvider): Date {
     if (x === null)
         return timeProvider.utcNow();
 
@@ -24,7 +24,7 @@ export function timeOrDefault(x: Models.ITimestamped, timeProvider : ITimeProvid
 // typesafe event raiser
 type EvtCallback<T> = (data?: T) => void;
 export class Evt<T> {
-    private _singleCallback : EvtCallback<T> = null;
+    private _singleCallback: EvtCallback<T> = null;
     private _multiCallback = new Array<EvtCallback<T>>();
 
     public on = (handler: EvtCallback<T>) => {
@@ -82,14 +82,14 @@ export function roundDown(x: number, minTick: number) {
 }
 
 export interface ITimeProvider {
-    utcNow() : Date;
+    utcNow(): Date;
     setTimeout(action: () => void, time: moment.Duration);
     setImmediate(action: () => void);
     setInterval(action: () => void, time: moment.Duration);
 }
 
 export interface IBacktestingTimeProvider extends ITimeProvider {
-    scrollTimeTo(time : moment.Moment);
+    scrollTimeTo(time: moment.Moment);
 }
 
 export class RealTimeProvider implements ITimeProvider {
@@ -123,7 +123,7 @@ export class ImmediateActionScheduler implements IActionScheduler {
     };
 }
 
-export function getJSON<T>(url: string, qs?: any) : Promise<T> {
+export function getJSON<T>(url: string, qs?: any): Promise<T> {
     return new Promise((resolve, reject) => {
         request({url: url, qs: qs}, (err: Error, resp, body) => {
             if (err) {
@@ -139,4 +139,4 @@ export function getJSON<T>(url: string, qs?: any) : Promise<T> {
             }
         });
     });
- }
+}

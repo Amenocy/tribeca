@@ -1,7 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="shared_directives.ts"/>
-///<reference path="pair.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -9,12 +5,12 @@ import Messaging = require("../common/messaging");
 import Shared = require("./shared_directives");
 
 interface TargetBasePositionScope extends ng.IScope {
-    targetBasePosition : number;
+    targetBasePosition: number;
 }
 
-var TargetBasePositionController = ($scope : TargetBasePositionScope, $log : ng.ILogService, subscriberFactory : Shared.SubscriberFactory) => {
+var TargetBasePositionController = ($scope: TargetBasePositionScope, $log: ng.ILogService, subscriberFactory: Shared.SubscriberFactory) => {
 
-    var update = (value : Models.TargetBasePositionValue) => {
+    var update = (value: Models.TargetBasePositionValue) => {
         if (value == null) return;
         $scope.targetBasePosition = value.data;
     };

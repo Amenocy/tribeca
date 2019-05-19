@@ -1,7 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="shared_directives.ts"/>
-///<reference path="pair.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -11,12 +7,12 @@ import Shared = require("./shared_directives");
 interface TradeSafetyScope extends ng.IScope {
     buySafety: number;
     sellSafety: number;
-    tradeSafetyValue : number;
+    tradeSafetyValue: number;
 }
 
-var TradeSafetyController = ($scope : TradeSafetyScope, $log : ng.ILogService, subscriberFactory : Shared.SubscriberFactory) => {
+var TradeSafetyController = ($scope: TradeSafetyScope, $log: ng.ILogService, subscriberFactory: Shared.SubscriberFactory) => {
 
-    var updateValue = (value : Models.TradeSafety) => {
+    var updateValue = (value: Models.TradeSafety) => {
         if (value == null) return;
         $scope.tradeSafetyValue = value.combined;
         $scope.buySafety = value.buy;

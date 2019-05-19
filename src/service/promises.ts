@@ -1,4 +1,4 @@
-export function timeout<T>(ms: number, promise: Promise<T>) : Promise<T> {
+export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
     return new Promise(function (resolve, reject) {
         promise.then(resolve);
         setTimeout(function () {
@@ -7,7 +7,7 @@ export function timeout<T>(ms: number, promise: Promise<T>) : Promise<T> {
     });
 }
 
-export function delay(ms: number) : Promise<{}> {
+export function delay(ms: number): Promise<{}> {
     return new Promise(function (resolve, reject) {
         setTimeout(resolve, ms); // (A)
     });

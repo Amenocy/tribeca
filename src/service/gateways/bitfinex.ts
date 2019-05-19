@@ -1,9 +1,3 @@
-/// <reference path="../utils.ts" />
-/// <reference path="../../common/models.ts" />
-/// <reference path="nullgw.ts" />
-///<reference path="../config.ts"/>
-///<reference path="../utils.ts"/>
-///<reference path="../interfaces.ts"/>
 
 import Q = require("q");
 import crypto = require("crypto");
@@ -199,8 +193,8 @@ class BitfinexOrderEntryGateway implements Interfaces.IOrderEntryGateway {
     OrderUpdate = new Utils.Evt<Models.OrderStatusUpdate>();
     ConnectChanged = new Utils.Evt<Models.ConnectivityStatus>();
 
-    supportsCancelAllOpenOrders = () : boolean => { return false; };
-    cancelAllOpenOrders = () : Q.Promise<number> => { return Q(0); };
+    supportsCancelAllOpenOrders = (): boolean => { return false; };
+    cancelAllOpenOrders = (): Q.Promise<number> => { return Q(0); };
 
     generateClientOrderId = () => shortId.generate();
 
@@ -532,16 +526,16 @@ class Bitfinex extends Interfaces.CombinedGateway {
 }
 
 interface SymbolDetails {
-    pair: string,
-    price_precision: number,
-    initial_margin:string,
-    minimum_margin:string,
-    maximum_order_size:string,
-    minimum_order_size:string,
-    expiration:string
+    pair: string;
+    price_precision: number;
+    initial_margin: string;
+    minimum_margin: string;
+    maximum_order_size: string;
+    minimum_order_size: string;
+    expiration: string;
 }
 
-export async function createBitfinex(timeProvider: Utils.ITimeProvider, config: Config.IConfigProvider, pair: Models.CurrencyPair) : Promise<Interfaces.CombinedGateway> {
+export async function createBitfinex(timeProvider: Utils.ITimeProvider, config: Config.IConfigProvider, pair: Models.CurrencyPair): Promise<Interfaces.CombinedGateway> {
     const detailsUrl = config.GetString("BitfinexHttpUrl")+"/symbols_details";
     const symbolDetails = await Utils.getJSON<SymbolDetails[]>(detailsUrl);
     const symbol = new BitfinexSymbolProvider(pair);    

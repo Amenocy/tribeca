@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="shared_directives.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -92,7 +89,7 @@ export class DisplayPair {
     connected = false;
     connectedToExchange = false;
     connectedToServer = false;
-    connectionMessage : string = null;
+    connectionMessage: string = null;
 
     active: QuotingButtonViewModel;
     quotingParameters: DisplayQuotingParameters;
@@ -143,14 +140,14 @@ export class DisplayPair {
         this.active = new QuotingButtonViewModel(
             activeSub,
             fireFactory.getFire(Messaging.Topics.ActiveChange)
-            );
+        );
         this._subscribers.push(activeSub);
 
         const qpSub = subscriberFactory.getSubscriber<Models.QuotingParameters>(scope, Messaging.Topics.QuotingParametersChange);
         this.quotingParameters = new DisplayQuotingParameters(
             qpSub,
             fireFactory.getFire(Messaging.Topics.QuotingParametersChange)
-            );
+        );
         this._subscribers.push(qpSub);
     }
 

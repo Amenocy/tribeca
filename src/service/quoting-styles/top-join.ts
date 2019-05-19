@@ -1,4 +1,3 @@
-/// <reference path="../../common/models.ts" />
 
 import StyleHelpers = require("./helpers");
 import Models = require("../../common/models");
@@ -6,7 +5,7 @@ import Models = require("../../common/models");
 export class TopOfTheMarketQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.Top;
     
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         return computeTopJoinQuote(input);
     };
 }
@@ -14,7 +13,7 @@ export class TopOfTheMarketQuoteStyle implements StyleHelpers.QuoteStyle {
 export class InverseTopOfTheMarketQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.InverseTop;
     
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         return computeInverseJoinQuote(input);
     };
 }
@@ -22,7 +21,7 @@ export class InverseTopOfTheMarketQuoteStyle implements StyleHelpers.QuoteStyle 
 export class InverseJoinQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.InverseJoin;
     
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         return computeInverseJoinQuote(input);
     };
 }
@@ -30,7 +29,7 @@ export class InverseJoinQuoteStyle implements StyleHelpers.QuoteStyle {
 export class PingPongQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.PingPong;
 
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         return computePingPongQuote(input);
     };
 }
@@ -38,7 +37,7 @@ export class PingPongQuoteStyle implements StyleHelpers.QuoteStyle {
 export class JoinQuoteStyle implements StyleHelpers.QuoteStyle {
     Mode = Models.QuotingMode.Join;
     
-    GenerateQuote = (input: StyleHelpers.QuoteInput) : StyleHelpers.GeneratedQuote => {
+    GenerateQuote = (input: StyleHelpers.QuoteInput): StyleHelpers.GeneratedQuote => {
         return computeTopJoinQuote(input);
     };
 }

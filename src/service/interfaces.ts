@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="utils.ts"/>
 
 import Utils = require("./utils");
 import Models = require("../common/models");
@@ -39,8 +36,8 @@ export interface IOrderEntryGateway extends IGateway {
     cancelsByClientOrderId: boolean;
     generateClientOrderId(): string;
     
-    supportsCancelAllOpenOrders() : boolean;
-    cancelAllOpenOrders() : q.Promise<number>;
+    supportsCancelAllOpenOrders(): boolean;
+    cancelAllOpenOrders(): q.Promise<number>;
 }
 
 export interface IPositionGateway {

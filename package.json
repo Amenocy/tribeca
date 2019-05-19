@@ -25,6 +25,7 @@
     "@types/q": "^1.0.0",
     "@types/request": "0.0.46",
     "@types/serve-static": "^1.7.31",
+    "@types/shortid": "0.0.29",
     "@types/socket.io": "^1.4.29",
     "@types/socket.io-client": "^1.4.29",
     "@types/ws": "0.0.39",
@@ -54,19 +55,32 @@
     "shortid": "2.2.8",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "typescript": "^2.4.1",
     "uuid": "^3.3.2",
+    "winston": "^3.2.1",
     "ws": "^1.0.1"
   },
   "devDependencies": {
-    "mocha": "^6.1.4"
+    "@types/mocha": "^5.2.6",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "browserify": "^16.2.3",
+    "eslint": "^5.16.0",
+    "mocha": "^6.1.4",
+    "typescript": "^3.2.1"
   },
   "scripts": {
+    "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "mocha",
-    "build": "grunt compile",
+    "browserify": "./node_modules/.bin/browserify tribeca/service/admin/js/admin/bundle.min.js -o tribeca/service/admin/js/admin/client.js",
+    "copy": "cp src/static/. tribeca/service/admin",
+    "tsc": "tsc --p tsconfig.service.json && tsc --p tsconfig.admin.json",
+    "build": "npm run lint && npm run tsc && npm run copy && npm run browserify",
+    "run": "forever tribeca/service/main.js",
+    "docker:build": "docker build -t tribeca .",
     "docker:start:mongo": "docker run -p 27017:27017 --name tribeca-mongo -d mongo",
     "docker:start": "docker run -p 3000:3000 --link tribeca-mongo:mongo --env-file ./env --name tribeca -d tribeca",
-    "docker:stop": "docker stop mongo && docker stop tribeca"
+    "docker:run": "npm run docker:start:mongo && npm run docker:start",
+    "docker:stop": "docker stop tribeca-mongo && docker stop tribeca"
   },
   "repository": {
     "type": "git",

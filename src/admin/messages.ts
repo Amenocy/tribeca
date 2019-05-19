@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-///<reference path="shared_directives.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -20,7 +17,7 @@ class MessageViewModel {
 
 interface MessageLoggerScope extends ng.IScope {
     messages: MessageViewModel[];
-    messageOptions: Object;
+    messageOptions: Record<string, any>;
 }
 
 var MessagesController = ($scope: MessageLoggerScope, $log: ng.ILogService, subscriberFactory: Shared.SubscriberFactory) => {

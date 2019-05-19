@@ -1,9 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="config.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="quoter.ts"/>
-/// <reference path="interfaces.ts"/>
 
 import Models = require("../common/models");
 import Utils = require("./utils");
@@ -26,7 +20,7 @@ export class MarketFiltration {
         private _scheduler: Utils.IActionScheduler,
         private _quoter: Quoter.Quoter,
         private _broker: Interfaces.IMarketDataBroker) {
-            _broker.MarketData.on(() => this._scheduler.schedule(this.filterFullMarket));
+        _broker.MarketData.on(() => this._scheduler.schedule(this.filterFullMarket));
     }
 
     private filterFullMarket = () => {

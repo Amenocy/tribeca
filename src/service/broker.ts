@@ -1,10 +1,3 @@
-/// <reference path="utils.ts" />
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="utils.ts"/>
-/// <reference path="interfaces.ts"/>
-/// <reference path="persister.ts"/>
-/// <reference path="messages.ts"/>
 
 import Models = require("../common/models");
 import Messaging = require("../common/messaging");
@@ -19,19 +12,19 @@ import log from "./logging";
 
 export class MarketDataBroker implements Interfaces.IMarketDataBroker {
     MarketData = new Utils.Evt<Models.Market>();
-    public get currentBook() : Models.Market { return this._currentBook; }
+    public get currentBook(): Models.Market { return this._currentBook; }
 
-    private _currentBook : Models.Market = null;
-    private handleMarketData = (book : Models.Market) => {
+    private _currentBook: Models.Market = null;
+    private handleMarketData = (book: Models.Market) => {
         this._currentBook = book;
         this.MarketData.trigger(this.currentBook);
     };
 
     constructor(time: Utils.ITimeProvider,
-                private _mdGateway : Interfaces.IMarketDataGateway,
-                rawMarketPublisher : Messaging.IPublish<Models.Market>,
-                persister: Persister.IPersist<Models.Market>,
-                private _messages : Messages.MessagesPubisher) {
+        private _mdGateway: Interfaces.IMarketDataGateway,
+        rawMarketPublisher: Messaging.IPublish<Models.Market>,
+        persister: Persister.IPersist<Models.Market>,
+        private _messages: Messages.MessagesPubisher) {
 
         time.setInterval(() => {
             if (!this.currentBook) return;
@@ -60,14 +53,14 @@ export class OrderStateCache implements Interfaces.IOrderStateCache {
 export class OrderBroker implements Interfaces.IOrderBroker {
     private _log = log("oe:broker");
 
-    async cancelOpenOrders() : Promise<number> {
+    async cancelOpenOrders(): Promise<number> {
         if (this._oeGateway.supportsCancelAllOpenOrders()) {
             return this._oeGateway.cancelAllOpenOrders();
         }
         
         const promiseMap = new Map<string, Q.Deferred<void>>();
 
-        const orderUpdate = (o : Models.OrderStatusReport) => {
+        const orderUpdate = (o: Models.OrderStatusReport) => {
             const p = promiseMap.get(o.orderId);
             if (p && Models.orderIsDone(o.orderStatus))
                 p.resolve(null);
@@ -92,19 +85,19 @@ export class OrderBroker implements Interfaces.IOrderBroker {
     }
 
     OrderUpdate = new Utils.Evt<Models.OrderStatusReport>();
-    private _cancelsWaitingForExchangeOrderId : {[clId : string] : Models.OrderCancel} = {};
+    private _cancelsWaitingForExchangeOrderId: {[clId: string]: Models.OrderCancel} = {};
 
     Trade = new Utils.Evt<Models.Trade>();
-    _trades : Models.Trade[] = [];
+    _trades: Models.Trade[] = [];
 
-    private roundPrice = (price: number, side: Models.Side) : number => {
+    private roundPrice = (price: number, side: Models.Side): number => {
         return Utils.roundSide(price, this._baseBroker.minTickIncrement, side);
     }
 
-    sendOrder = (order : Models.SubmitNewOrder) : Models.SentOrder => {
+    sendOrder = (order: Models.SubmitNewOrder): Models.SentOrder => {
         const orderId = this._oeGateway.generateClientOrderId();
 
-        const rpt : Models.OrderStatusUpdate = {
+        const rpt: Models.OrderStatusUpdate = {
             pair: this._baseBroker.pair,
             orderId: orderId,
             side: order.side,
@@ -124,14 +117,14 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         return new Models.SentOrder(rpt.orderId);
     };
 
-    replaceOrder = (replace : Models.CancelReplaceOrder) : Models.SentOrder => {
+    replaceOrder = (replace: Models.CancelReplaceOrder): Models.SentOrder => {
         const rpt = this._orderCache.allOrders.get(replace.origOrderId);
 
         if (!rpt) {
             throw new Error("Unknown order, cannot replace " + replace.origOrderId);
         }
 
-        const report : Models.OrderStatusUpdate = {
+        const report: Models.OrderStatusUpdate = {
             orderId: replace.origOrderId,
             orderStatus: Models.OrderStatus.Working,
             pendingReplace: true,
@@ -144,7 +137,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         return new Models.SentOrder(report.orderId);
     };
 
-    cancelOrder = (cancel : Models.OrderCancel) => {
+    cancelOrder = (cancel: Models.OrderCancel) => {
         const rpt = this._orderCache.allOrders.get(cancel.origOrderId);
 
         if (!this._oeGateway.cancelsByClientOrderId) {
@@ -160,7 +153,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
             throw new Error("Unknown order, cannot cancel " + cancel.origOrderId);
         }
 
-        const report : Models.OrderStatusUpdate = {
+        const report: Models.OrderStatusUpdate = {
             orderId: cancel.origOrderId,
             orderStatus: Models.OrderStatus.Working,
             pendingCancel: true
@@ -169,8 +162,8 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         this._oeGateway.cancelOrder(this.updateOrderState(report));
     };
 
-    public updateOrderState = (osr : Models.OrderStatusUpdate) : Models.OrderStatusReport => {
-        let orig : Models.OrderStatusUpdate;
+    public updateOrderState = (osr: Models.OrderStatusUpdate): Models.OrderStatusReport => {
+        let orig: Models.OrderStatusUpdate;
         if (osr.orderStatus === Models.OrderStatus.New) {
             orig = osr;
         }
@@ -187,11 +180,11 @@ export class OrderBroker implements Interfaces.IOrderBroker {
             }
 
             if (typeof orig === "undefined") {
-                this._log.error({
+                this._log.error("no existing order for non-New update!", {
                     update: osr,
                     existingExchangeIdsToClientIds: this._orderCache.exchIdsToClientIds,
                     existingIds: Array.from(this._orderCache.allOrders.keys())
-                }, "no existing order for non-New update!");
+                });
                 return;
             }
         }
@@ -201,7 +194,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         const quantity = getOrFallback(osr.quantity, orig.quantity);
         const leavesQuantity = getOrFallback(osr.leavesQuantity, orig.leavesQuantity);
 
-        let cumQuantity : number = undefined;
+        let cumQuantity: number = undefined;
         if (typeof osr.cumQuantity !== "undefined") {
             cumQuantity = getOrFallback(osr.cumQuantity, orig.cumQuantity);
         }
@@ -211,7 +204,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
 
         const partiallyFilled = cumQuantity > 0 && cumQuantity !== quantity;
 
-        const o : Models.OrderStatusReport = {
+        const o: Models.OrderStatusReport = {
             pair: getOrFallback(osr.pair, orig.pair),
             side: getOrFallback(osr.side, orig.side),
             quantity: quantity,
@@ -241,8 +234,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         };
 
         const added = this.updateOrderStatusInMemory(o);
-        if (this._log.debug())
-            this._log.debug(o, (added ? "added" : "removed") + " order status");
+        this._log.debug(`${added ? "added" : "removed"} order status`, o);
 
         // cancel any open orders waiting for oid
         if (!this._oeGateway.cancelsByClientOrderId
@@ -284,7 +276,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
     };
 
     private _pendingRemovals = new Array<Models.OrderStatusReport>();
-    private updateOrderStatusInMemory = (osr : Models.OrderStatusReport) : boolean => {
+    private updateOrderStatusInMemory = (osr: Models.OrderStatusReport): boolean => {
         if (this.shouldPublish(osr) || !Models.orderIsDone(osr.orderStatus)) {
             this.addOrderStatusInMemory(osr);
             return true;
@@ -295,7 +287,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         }
     };
 
-    private addOrderStatusInMemory = (osr : Models.OrderStatusReport) => {
+    private addOrderStatusInMemory = (osr: Models.OrderStatusReport) => {
         this._orderCache.exchIdsToClientIds.set(osr.exchangeId, osr.orderId);
         this._orderCache.allOrders.set(osr.orderId, osr);
     };
@@ -315,7 +307,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         this._pendingRemovals = kept;
     };
 
-    private shouldPublish = (o: Models.OrderStatusReport) : boolean => {
+    private shouldPublish = (o: Models.OrderStatusReport): boolean => {
         if (o.source === null) throw new Error(JSON.stringify(o));
         if (this._publishAllOrders) return true;
 
@@ -328,32 +320,32 @@ export class OrderBroker implements Interfaces.IOrderBroker {
         }
     };
 
-    private orderStatusSnapshot = () : Models.OrderStatusReport[] => {
+    private orderStatusSnapshot = (): Models.OrderStatusReport[] => {
         return Array.from(this._orderCache.allOrders.values()).filter(this.shouldPublish);
     }
 
     constructor(private _timeProvider: Utils.ITimeProvider,
-                private _baseBroker : Interfaces.IBroker,
-                private _oeGateway : Interfaces.IOrderEntryGateway,
-                private _orderPersister : Persister.IPersist<Models.OrderStatusReport>,
-                private _tradePersister : Persister.IPersist<Models.Trade>,
-                private _orderStatusPublisher : Messaging.IPublish<Models.OrderStatusReport>,
-                private _tradePublisher : Messaging.IPublish<Models.Trade>,
-                private _submittedOrderReciever : Messaging.IReceive<Models.OrderRequestFromUI>,
-                private _cancelOrderReciever : Messaging.IReceive<Models.OrderStatusReport>,
-                private _cancelAllOrdersReciever : Messaging.IReceive<Models.CancelAllOrdersRequest>,
-                private _messages : Messages.MessagesPubisher,
-                private _orderCache : OrderStateCache,
-                initOrders : Models.OrderStatusReport[],
-                initTrades : Models.Trade[],
-                private readonly _publishAllOrders: boolean) {
+        private _baseBroker: Interfaces.IBroker,
+        private _oeGateway: Interfaces.IOrderEntryGateway,
+        private _orderPersister: Persister.IPersist<Models.OrderStatusReport>,
+        private _tradePersister: Persister.IPersist<Models.Trade>,
+        private _orderStatusPublisher: Messaging.IPublish<Models.OrderStatusReport>,
+        private _tradePublisher: Messaging.IPublish<Models.Trade>,
+        private _submittedOrderReciever: Messaging.IReceive<Models.OrderRequestFromUI>,
+        private _cancelOrderReciever: Messaging.IReceive<Models.OrderStatusReport>,
+        private _cancelAllOrdersReciever: Messaging.IReceive<Models.CancelAllOrdersRequest>,
+        private _messages: Messages.MessagesPubisher,
+        private _orderCache: OrderStateCache,
+        initOrders: Models.OrderStatusReport[],
+        initTrades: Models.Trade[],
+        private readonly _publishAllOrders: boolean) {
         _.each(initOrders, this.addOrderStatusInMemory);
         _.each(initTrades, t => this._trades.push(t));
                 
         _orderStatusPublisher.registerSnapshot(() => this.orderStatusSnapshot());
         _tradePublisher.registerSnapshot(() => _.takeRight(this._trades, 100));
 
-        _submittedOrderReciever.registerReceiver((o : Models.OrderRequestFromUI) => {
+        _submittedOrderReciever.registerReceiver((o: Models.OrderRequestFromUI) => {
             this._log.info("got new order req", o);
             try {
                 const order = new Models.SubmitNewOrder(Models.Side[o.side], o.quantity, Models.OrderType[o.orderType],
@@ -379,7 +371,7 @@ export class OrderBroker implements Interfaces.IOrderBroker {
             this._log.info("handling cancel all orders request");
             this.cancelOpenOrders()
                 .then(x => this._log.info("cancelled all ", x, " open orders"), 
-                      e => this._log.error(e, "error when cancelling all orders!"));
+                    e => this._log.error(e, "error when cancelling all orders!"));
         });
 
         this._oeGateway.OrderUpdate.on(this.updateOrderState);
@@ -397,17 +389,17 @@ export class PositionBroker implements Interfaces.IPositionBroker {
 
     public NewReport = new Utils.Evt<Models.PositionReport>();
 
-    private _report : Models.PositionReport = null;
-    public get latestReport() : Models.PositionReport {
+    private _report: Models.PositionReport = null;
+    public get latestReport(): Models.PositionReport {
         return this._report;
     }
 
-    private _currencies : { [currency : number] : Models.CurrencyPosition } = {};
-    public getPosition(currency : Models.Currency) : Models.CurrencyPosition {
+    private _currencies: { [currency: number]: Models.CurrencyPosition } = {};
+    public getPosition(currency: Models.Currency): Models.CurrencyPosition {
         return this._currencies[currency];
     }
 
-    private onPositionUpdate = (rpt : Models.CurrencyPosition) => {
+    private onPositionUpdate = (rpt: Models.CurrencyPosition) => {
         this._currencies[rpt.currency] = rpt;
         const basePosition = this.getPosition(this._base.pair.base);
         const quotePosition = this.getPosition(this._base.pair.quote);
@@ -441,11 +433,11 @@ export class PositionBroker implements Interfaces.IPositionBroker {
     };
 
     constructor(private _timeProvider: Utils.ITimeProvider,
-                private _base : Interfaces.IBroker,
-                private _posGateway : Interfaces.IPositionGateway,
-                private _positionPublisher : Messaging.IPublish<Models.PositionReport>,
-                private _positionPersister : Persister.IPersist<Models.PositionReport>,
-                private _mdBroker : Interfaces.IMarketDataBroker) {
+        private _base: Interfaces.IBroker,
+        private _posGateway: Interfaces.IPositionGateway,
+        private _positionPublisher: Messaging.IPublish<Models.PositionReport>,
+        private _positionPersister: Persister.IPersist<Models.PositionReport>,
+        private _mdBroker: Interfaces.IMarketDataBroker) {
         this._posGateway.PositionUpdate.on(this.onPositionUpdate);
 
         this._positionPublisher.registerSnapshot(() => (this._report === null ? [] : [this._report]));
@@ -459,15 +451,15 @@ export class ExchangeBroker implements Interfaces.IBroker {
         return this._baseGateway.hasSelfTradePrevention;
     }
 
-    makeFee() : number {
+    makeFee(): number {
         return this._baseGateway.makeFee();
     }
 
-    takeFee() : number {
+    takeFee(): number {
         return this._baseGateway.takeFee();
     }
 
-    exchange() : Models.Exchange {
+    exchange(): Models.Exchange {
         return this._baseGateway.exchange();
     }
 
@@ -483,7 +475,7 @@ export class ExchangeBroker implements Interfaces.IBroker {
     private mdConnected = Models.ConnectivityStatus.Disconnected;
     private oeConnected = Models.ConnectivityStatus.Disconnected;
     private _connectStatus = Models.ConnectivityStatus.Disconnected;
-    public onConnect = (gwType : Models.GatewayType, cs : Models.ConnectivityStatus) => {
+    public onConnect = (gwType: Models.GatewayType, cs: Models.ConnectivityStatus) => {
         if (gwType === Models.GatewayType.MarketData) {
             if (this.mdConnected === cs) return;
             this.mdConnected = cs;
@@ -506,15 +498,15 @@ export class ExchangeBroker implements Interfaces.IBroker {
         this._connectivityPublisher.publish(this.connectStatus);
     };
 
-    public get connectStatus() : Models.ConnectivityStatus {
+    public get connectStatus(): Models.ConnectivityStatus {
         return this._connectStatus;
     }
 
-    constructor(private _pair : Models.CurrencyPair,
-                private _mdGateway : Interfaces.IMarketDataGateway,
-                private _baseGateway : Interfaces.IExchangeDetailsGateway,
-                private _oeGateway : Interfaces.IOrderEntryGateway,
-                private _connectivityPublisher : Messaging.IPublish<Models.ConnectivityStatus>) {
+    constructor(private _pair: Models.CurrencyPair,
+        private _mdGateway: Interfaces.IMarketDataGateway,
+        private _baseGateway: Interfaces.IExchangeDetailsGateway,
+        private _oeGateway: Interfaces.IOrderEntryGateway,
+        private _connectivityPublisher: Messaging.IPublish<Models.ConnectivityStatus>) {
         this._mdGateway.ConnectChanged.on(s => {
             this.onConnect(Models.GatewayType.MarketData, s);
         });

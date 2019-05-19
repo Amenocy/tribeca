@@ -1,6 +1,3 @@
-/// <reference path="../utils.ts" />
-/// <reference path="../../common/models.ts" />
-///<reference path="../interfaces.ts"/>
 
 import * as _ from "lodash";
 import * as Q from "q";
@@ -14,8 +11,8 @@ export class NullOrderGateway implements Interfaces.IOrderEntryGateway {
     OrderUpdate = new Utils.Evt<Models.OrderStatusUpdate>();
     ConnectChanged = new Utils.Evt<Models.ConnectivityStatus>();
     
-    supportsCancelAllOpenOrders = () : boolean => { return false; };
-    cancelAllOpenOrders = () : Q.Promise<number> => { return Q(0); };
+    supportsCancelAllOpenOrders = (): boolean => { return false; };
+    cancelAllOpenOrders = (): Q.Promise<number> => { return Q(0); };
 
     public cancelsByClientOrderId = true;
 
@@ -149,6 +146,6 @@ class NullGateway extends Interfaces.CombinedGateway {
     }
 }
 
-export async function createNullGateway(config: Config.IConfigProvider, pair: Models.CurrencyPair) : Promise<Interfaces.CombinedGateway> {
+export async function createNullGateway(config: Config.IConfigProvider, pair: Models.CurrencyPair): Promise<Interfaces.CombinedGateway> {
     return new NullGateway(config, pair);
 }

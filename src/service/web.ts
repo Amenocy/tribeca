@@ -1,7 +1,3 @@
-/// <reference path="utils.ts" />
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-///<reference path="persister.ts"/>
 
 import Messaging = require("../common/messaging");
 import _ = require("lodash");
@@ -18,7 +14,7 @@ export class StandaloneHttpPublisher<T> {
         
         _httpApp.get("/data/" + route, (req: express.Request, res: express.Response) => {
             var getParameter = <T>(pName: string, cvt: (r: string) => T) => {
-                var rawMax : string = req.param(pName, null);
+                var rawMax: string = req.param(pName, null);
                 return (rawMax === null ? null : cvt(rawMax));
             };
             
@@ -31,7 +27,7 @@ export class StandaloneHttpPublisher<T> {
                 res.json(d);
             };
 
-            const selector : Object = startTime == null
+            const selector: Record<string, any> = startTime == null
                 ? null
                 : {time: { $gte: startTime.toDate() }}
 

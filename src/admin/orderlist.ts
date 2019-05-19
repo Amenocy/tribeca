@@ -1,5 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="shared_directives.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -79,10 +77,10 @@ class DisplayOrderStatusReport {
 }
 
 var OrderListController = ($scope: OrderListScope,
-                           $log: ng.ILogService,
-                           subscriberFactory: Shared.SubscriberFactory,
-                           fireFactory: Shared.FireFactory,
-                           uiGridConstants: any) => {
+    $log: ng.ILogService,
+    subscriberFactory: Shared.SubscriberFactory,
+    fireFactory: Shared.FireFactory,
+    uiGridConstants: any) => {
     var fireCxl = fireFactory.getFire(Messaging.Topics.CancelOrder);
 
     $scope.order_statuses = [];

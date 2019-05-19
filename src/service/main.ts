@@ -1,22 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="broker.ts"/>
-/// <reference path="active-state.ts"/>
-/// <reference path="backtest.ts"/>
-/// <reference path="config.ts"/>
-/// <reference path="fair-value.ts"/>
-/// <reference path="interfaces.ts"/>
-/// <reference path="market-filtration.ts"/>
-/// <reference path="markettrades.ts"/>
-/// <reference path="messages.ts"/>
-/// <reference path="quote-sender.ts"/>
-/// <reference path="quoter.ts"/>
-/// <reference path="quoting-engine.ts"/>
-/// <reference path="quoting-parameters.ts"/>
-/// <reference path="safety.ts"/>
-/// <reference path="statistics.ts"/>
-/// <reference path="utils.ts"/>
-/// <reference path="web.ts"/>
 
 import _ = require("lodash");
 import path = require("path");
@@ -67,7 +48,7 @@ const serverUrl = 'BACKTEST_SERVER_URL' in process.env ? process.env['BACKTEST_S
 
 const config = new Config.ConfigProvider();
 
-let exitingEvent : () => Promise<number> = () => new Promise(() => 0);
+let exitingEvent: () => Promise<number> = () => new Promise(() => 0);
 
 const performExit = () => {
     Promises.timeout(2000, exitingEvent()).then(completed => {
@@ -101,7 +82,7 @@ process.on("SIGINT", () => {
 const mainLog = log("tribeca:main");
 const messagingLog = log("tribeca:messaging");
 
-function ParseCurrencyPair(raw: string) : Models.CurrencyPair {
+function ParseCurrencyPair(raw: string): Models.CurrencyPair {
     const split = raw.split("/");
     if (split.length !== 2) 
         throw new Error("Invalid currency pair! Must be in the format of BASE/QUOTE, eg BTC/USD");
@@ -110,12 +91,12 @@ function ParseCurrencyPair(raw: string) : Models.CurrencyPair {
 }
 const pair = ParseCurrencyPair(config.GetString("TradedPair"));
 
-const defaultActive : Models.SerializedQuotesActive = new Models.SerializedQuotesActive(false, new Date(1));
-const defaultQuotingParameters : Models.QuotingParameters = new Models.QuotingParameters(.3, .05, Models.QuotingMode.Top, 
+const defaultActive: Models.SerializedQuotesActive = new Models.SerializedQuotesActive(false, new Date(1));
+const defaultQuotingParameters: Models.QuotingParameters = new Models.QuotingParameters(.3, .05, Models.QuotingMode.Top, 
     Models.FairValueModel.BBO, 3, .8, false, Models.AutoPositionMode.Off, false, 2.5, 300, .095, 2*.095, .095, 3, .1);
 
-const backTestSetup = (inputData : Array<Models.Market | Models.MarketTrade>, parameters : Backtest.BacktestParameters) : Container => {
-    const timeProvider : Utils.ITimeProvider = new Backtest.BacktestTimeProvider(moment(_.first(inputData).time), moment(_.last(inputData).time));
+const backTestSetup = (inputData: (Models.Market | Models.MarketTrade)[], parameters: Backtest.BacktestParameters): Container => {
+    const timeProvider: Utils.ITimeProvider = new Backtest.BacktestTimeProvider(moment(_.first(inputData).time), moment(_.last(inputData).time));
     const exchange = Models.Exchange.Null;
     const gw = new Backtest.BacktestGateway(inputData, parameters.startingBasePosition, parameters.startingQuotePosition, <Backtest.BacktestTimeProvider>timeProvider);
     
@@ -125,14 +106,14 @@ const backTestSetup = (inputData : Array<Models.Market | Models.MarketTrade>, pa
         return new Messaging.NullPublisher<T>();
     };
     
-    const getReceiver = <T>(topic: string) : Messaging.IReceive<T> => new Messaging.NullReceiver<T>();
+    const getReceiver = <T>(topic: string): Messaging.IReceive<T> => new Messaging.NullReceiver<T>();
     
-    const getPersister = <T>(collectionName: string) : Promise<Persister.ILoadAll<T>> => new Promise((cb) => cb(new Backtest.BacktestPersister<T>()));
+    const getPersister = <T>(collectionName: string): Promise<Persister.ILoadAll<T>> => new Promise((cb) => cb(new Backtest.BacktestPersister<T>()));
     
-    const getRepository = <T>(defValue: T, collectionName: string) : Promise<Persister.ILoadLatest<T>> => new Promise(cb => cb(new Backtest.BacktestPersister<T>([defValue])));
+    const getRepository = <T>(defValue: T, collectionName: string): Promise<Persister.ILoadLatest<T>> => new Promise(cb => cb(new Backtest.BacktestPersister<T>([defValue])));
     
-    const startingActive : Models.SerializedQuotesActive = new Models.SerializedQuotesActive(true, timeProvider.utcNow());
-    const startingParameters : Models.QuotingParameters = parameters.quotingParameters;
+    const startingActive: Models.SerializedQuotesActive = new Models.SerializedQuotesActive(true, timeProvider.utcNow());
+    const startingParameters: Models.QuotingParameters = parameters.quotingParameters;
 
     return {
         exchange: exchange,
@@ -147,8 +128,8 @@ const backTestSetup = (inputData : Array<Models.Market | Models.MarketTrade>, pa
     };
 };
 
-const liveTradingSetup = () : Container => {
-    const timeProvider : Utils.ITimeProvider = new Utils.RealTimeProvider();
+const liveTradingSetup = (): Container => {
+    const timeProvider: Utils.ITimeProvider = new Utils.RealTimeProvider();
     
     const app = express();
     const http_server = http.createServer(app);
@@ -158,7 +139,7 @@ const liveTradingSetup = () : Container => {
     const password = config.GetString("WebClientPassword");
     if (username !== "NULL" && password !== "NULL") {
         mainLog.info("Requiring authentication to web client");
-        const basicAuth = require('basic-auth-connect');
+        const basicAuth = require('basic-auth-connect'); // eslint-disable-line
         app.use(basicAuth((u, p) => u === username && p === password));
     }
 
@@ -201,17 +182,17 @@ const liveTradingSetup = () : Container => {
             return socketIoPublisher;
     };
     
-    const getReceiver = <T>(topic: string) : Messaging.IReceive<T> => 
+    const getReceiver = <T>(topic: string): Messaging.IReceive<T> => 
         new Messaging.Receiver<T>(topic, io, messagingLog.info.bind(messagingLog));
     
     const db = Persister.loadDb(config);
     
-    const getPersister = async <T extends Persister.Persistable>(collectionName: string) : Promise<Persister.ILoadAll<T>> => {
+    const getPersister = async <T extends Persister.Persistable>(collectionName: string): Promise<Persister.ILoadAll<T>> => {
         const coll = (await (await db).collection(collectionName));
         return new Persister.Persister<T>(timeProvider, coll, collectionName, exchange, pair);
     };
         
-    const getRepository = async <T extends Persister.Persistable>(defValue: T, collectionName: string) : Promise<Persister.ILoadLatest<T>> => 
+    const getRepository = async <T extends Persister.Persistable>(defValue: T, collectionName: string): Promise<Persister.ILoadLatest<T>> => 
         new Persister.RepositoryPersister<T>(await (await db).collection(collectionName), defValue, collectionName, exchange, pair);
 
     return {
@@ -229,17 +210,17 @@ const liveTradingSetup = () : Container => {
 
 interface Container {
     exchange: Models.Exchange;
-    startingActive : Models.SerializedQuotesActive;
-    startingParameters : Models.QuotingParameters;
+    startingActive: Models.SerializedQuotesActive;
+    startingParameters: Models.QuotingParameters;
     timeProvider: Utils.ITimeProvider;
     getExch(orderCache: Broker.OrderStateCache): Promise<Interfaces.CombinedGateway>;
-    getReceiver<T>(topic: string) : Messaging.IReceive<T>;
-    getPersister<T extends Persister.Persistable>(collectionName: string) : Promise<Persister.ILoadAll<T>>;
-    getRepository<T>(defValue: T, collectionName: string) : Promise<Persister.ILoadLatest<T>>;
+    getReceiver<T>(topic: string): Messaging.IReceive<T>;
+    getPersister<T extends Persister.Persistable>(collectionName: string): Promise<Persister.ILoadAll<T>>;
+    getRepository<T>(defValue: T, collectionName: string): Promise<Persister.ILoadLatest<T>>;
     getPublisher<T>(topic: string, persister?: Persister.ILoadAll<T>): Messaging.IPublish<T>;
 }
 
-const runLiveTrading = async (onion: Container) : Promise<void> => {
+const runLiveTrading = async (onion: Container): Promise<void> => {
     const getPersister = onion.getPersister;
     const orderPersister = await getPersister<Models.OrderStatusReport>("osr");
     const tradesPersister = await getPersister<Models.Trade>("trades");
@@ -309,14 +290,14 @@ const runLiveTrading = async (onion: Container) : Promise<void> => {
     const cancelAllOrdersReceiver = getReceiver(Messaging.Topics.CancelAllOrders);
             
     const broker = new Broker.ExchangeBroker(pair, gateway.md, gateway.base, gateway.oe, connectivity);
-    mainLog.info({
+    mainLog.info("using the following exchange details", {
         exchange: broker.exchange, 
         pair: broker.pair.toString(), 
         minTick: broker.minTickIncrement, 
         makeFee: broker.makeFee,
         takeFee: broker.takeFee,
         hasSelfTradePrevention: broker.hasSelfTradePrevention,
-    }, "using the following exchange details");
+    });
 
     const orderBroker = new Broker.OrderBroker(timeProvider, broker, gateway.oe, orderPersister, tradesPersister, orderStatusPublisher,
         tradePublisher, submitOrderReceiver, cancelOrderReceiver, cancelAllOrdersReceiver, messages, orderCache, initOrders, initTrades, shouldPublishAllOrders);
@@ -379,8 +360,8 @@ const runLiveTrading = async (onion: Container) : Promise<void> => {
         console.log("sending back results, took: ", moment(Utils.date()).diff(t, "seconds"));
         
         request({url: serverUrl+"/result", 
-                    method: 'POST', 
-                    json: results}, (err, resp, body) => { });
+            method: 'POST', 
+            json: results}, (err, resp, body) => { });
     }
     
     exitingEvent = () => {
@@ -407,7 +388,7 @@ const runLiveTrading = async (onion: Container) : Promise<void> => {
 const runBacktest = async (): Promise<void> => {
     console.log("enter backtest mode");
         
-    const getFromBacktestServer = (ep: string) : Promise<any> => {
+    const getFromBacktestServer = (ep: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             request.get(serverUrl+"/"+ep, (err, resp, body) => { 
                 if (err) reject(err);
@@ -417,7 +398,7 @@ const runBacktest = async (): Promise<void> => {
     };
 
     const input = await getFromBacktestServer("inputData").then(body => {
-        const inp : Array<Models.Market | Models.MarketTrade> = (typeof body ==="string") ? eval(body) : body;
+        const inp: (Models.Market | Models.MarketTrade)[] = (typeof body ==="string") ? eval(body) : body;
         
         for (let i = 0; i < inp.length; i++) {
             const d = inp[i];
@@ -427,7 +408,7 @@ const runBacktest = async (): Promise<void> => {
         return inp;
     });
 
-    const nextParameters = () : Promise<Backtest.BacktestParameters> => getFromBacktestServer("nextParameters").then(body => {
+    const nextParameters = (): Promise<Backtest.BacktestParameters> => getFromBacktestServer("nextParameters").then(body => {
         const p = (typeof body ==="string") ? <string|Backtest.BacktestParameters>JSON.parse(body) : body;
         console.log("Recv'd parameters", util.inspect(p));
         return (typeof p === "string") ? null : p;
@@ -440,7 +421,7 @@ const runBacktest = async (): Promise<void> => {
     }
 }
 
-const harness = async () : Promise<any> =>
+const harness = async (): Promise<any> =>
     config.inBacktestMode ? runBacktest() : runLiveTrading(liveTradingSetup());
 
 harness();

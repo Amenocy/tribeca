@@ -1,4 +1,3 @@
-/// <reference path="../common/models.ts" />
 
 import fs = require("fs");
 import log from "./logging";
@@ -46,8 +45,8 @@ export class ConfigProvider implements IConfigProvider {
         return this.Fetch<string>(configKey, true, x => x.toString());
     };
     
-    private Fetch = <T>(configKey: string, throwIfMissing: boolean, cvt: (d: Object) => T): T => {
-        let value : any = null;
+    private Fetch = <T>(configKey: string, throwIfMissing: boolean, cvt: (d: Record<string, any>) => T): T => {
+        let value: any = null;
         if (process.env.hasOwnProperty(configKey))
             value = process.env[configKey];
         else if (this._config.hasOwnProperty(configKey))

@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import * as moment from "moment"
 
 export interface ITimestamped {
-    time : Date;
+    time: Date;
 }
 
 export class Timestamped<T> implements ITimestamped {
@@ -15,7 +15,7 @@ export class Timestamped<T> implements ITimestamped {
 
 export class MarketSide {
     constructor(public price: number,
-                public size: number) { }
+        public size: number) { }
 
     public toString() {
         return "px=" + this.price + ";size=" + this.size;
@@ -24,10 +24,10 @@ export class MarketSide {
 
 export class GatewayMarketTrade implements ITimestamped {
     constructor(public price: number,
-                public size: number,
-                public time: Date,
-                public onStartup: boolean,
-                public make_side: Side) { }
+        public size: number,
+        public time: Date,
+        public onStartup: boolean,
+        public make_side: Side) { }
 }
 
 export function marketSideEquals(t: MarketSide, other: MarketSide, tol?: number) {
@@ -38,8 +38,8 @@ export function marketSideEquals(t: MarketSide, other: MarketSide, tol?: number)
 
 export class Market implements ITimestamped {
     constructor(public bids: MarketSide[],
-                public asks: MarketSide[],
-                public time: Date) { }
+        public asks: MarketSide[],
+        public time: Date) { }
 
     public toString() {
         return "asks: [" + this.asks.join(";") + "] bids: [" + this.bids.join(";") + "]";
@@ -48,14 +48,14 @@ export class Market implements ITimestamped {
 
 export class MarketTrade implements ITimestamped {
     constructor(public exchange: Exchange,
-                public pair: CurrencyPair,
-                public price: number,
-                public size: number,
-                public time: Date,
-                public quote: TwoSidedQuote,
-                public bid: MarketSide,
-                public ask: MarketSide,
-                public make_side: Side) {}
+        public pair: CurrencyPair,
+        public price: number,
+        public size: number,
+        public time: Date,
+        public quote: TwoSidedQuote,
+        public bid: MarketSide,
+        public ask: MarketSide,
+        public make_side: Side) {}
 }
 
 export enum Currency {
@@ -94,11 +94,11 @@ export enum Currency {
     AMP 
 }
 
-export function toCurrency(c: string) : Currency|undefined {
+export function toCurrency(c: string): Currency|undefined {
     return Currency[c.toUpperCase()];
 }
 
-export function fromCurrency(c: Currency) : string|undefined {
+export function fromCurrency(c: Currency): string|undefined {
     const t = Currency[c];
     if (t) return t.toUpperCase();
     return undefined;
@@ -141,31 +141,31 @@ export enum OrderSource {
 
 export class SubmitNewOrder {
     constructor(public side: Side,
-                public quantity: number,
-                public type: OrderType,
-                public price: number,
-                public timeInForce: TimeInForce,
-                public exchange: Exchange,
-                public generatedTime: Date,
-                public preferPostOnly: boolean,
-                public source: OrderSource,
-                public msg?: string) {
-                    this.msg = msg || null;
-                }
+        public quantity: number,
+        public type: OrderType,
+        public price: number,
+        public timeInForce: TimeInForce,
+        public exchange: Exchange,
+        public generatedTime: Date,
+        public preferPostOnly: boolean,
+        public source: OrderSource,
+        public msg?: string) {
+        this.msg = msg || null;
+    }
 }
 
 export class CancelReplaceOrder {
     constructor(public origOrderId: string,
-                public quantity: number,
-                public price: number,
-                public exchange: Exchange,
-                public generatedTime: Date) {}
+        public quantity: number,
+        public price: number,
+        public exchange: Exchange,
+        public generatedTime: Date) {}
 }
 
 export class OrderCancel {
     constructor(public origOrderId: string,
-                public exchange: Exchange,
-                public generatedTime: Date) {}
+        public exchange: Exchange,
+        public generatedTime: Date) {}
 }
 
 export class SentOrder {
@@ -173,53 +173,53 @@ export class SentOrder {
 }
 
 export interface OrderStatusReport {
-    pair : CurrencyPair;
-    side : Side;
-    quantity : number;
-    type : OrderType;
-    price : number;
-    timeInForce : TimeInForce;
-    orderId : string;
-    exchangeId : string;
-    orderStatus : OrderStatus;
-    rejectMessage : string;
-    time : Date;
-    lastQuantity : number;
-    lastPrice : number;
-    leavesQuantity : number;
-    cumQuantity : number;
-    averagePrice : number;
-    liquidity : Liquidity;
-    exchange : Exchange;
-    computationalLatency : number;
-    version : number;
+    pair: CurrencyPair;
+    side: Side;
+    quantity: number;
+    type: OrderType;
+    price: number;
+    timeInForce: TimeInForce;
+    orderId: string;
+    exchangeId: string;
+    orderStatus: OrderStatus;
+    rejectMessage: string;
+    time: Date;
+    lastQuantity: number;
+    lastPrice: number;
+    leavesQuantity: number;
+    cumQuantity: number;
+    averagePrice: number;
+    liquidity: Liquidity;
+    exchange: Exchange;
+    computationalLatency: number;
+    version: number;
     preferPostOnly: boolean;
-    source: OrderSource,
-    partiallyFilled : boolean;
-    pendingCancel : boolean;
-    pendingReplace : boolean;
-    cancelRejected : boolean;
+    source: OrderSource;
+    partiallyFilled: boolean;
+    pendingCancel: boolean;
+    pendingReplace: boolean;
+    cancelRejected: boolean;
 }
 
 export interface OrderStatusUpdate extends Partial<OrderStatusReport> { }
 
 export class Trade implements ITimestamped {
     constructor(public tradeId: string,
-                public time: Date,
-                public exchange: Exchange,
-                public pair: CurrencyPair,
-                public price: number,
-                public quantity: number,
-                public side: Side,
-                public value: number,
-                public liquidity: Liquidity,
-                public feeCharged: number) {}
+        public time: Date,
+        public exchange: Exchange,
+        public pair: CurrencyPair,
+        public price: number,
+        public quantity: number,
+        public side: Side,
+        public value: number,
+        public liquidity: Liquidity,
+        public feeCharged: number) {}
 }
 
 export class CurrencyPosition {
     constructor(public amount: number,
-                public heldAmount: number,
-                public currency: Currency) {}
+        public heldAmount: number,
+        public currency: Currency) {}
 
     public toString() {
         return "currency=" + Currency[this.currency] + ";amount=" + this.amount;
@@ -228,27 +228,27 @@ export class CurrencyPosition {
 
 export class PositionReport {
     constructor(public baseAmount: number,
-                public quoteAmount: number,
-                public baseHeldAmount: number,
-                public quoteHeldAmount: number,
-                public value: number,
-                public quoteValue: number,
-                public pair: CurrencyPair,
-                public exchange: Exchange,
-                public time: Date) {}
+        public quoteAmount: number,
+        public baseHeldAmount: number,
+        public quoteHeldAmount: number,
+        public value: number,
+        public quoteValue: number,
+        public pair: CurrencyPair,
+        public exchange: Exchange,
+        public time: Date) {}
 }
 
 export class OrderRequestFromUI {
     constructor(public side: string,
-                public price: number,
-                public quantity: number,
-                public timeInForce: string,
-                public orderType: string) {}
+        public price: number,
+        public quantity: number,
+        public timeInForce: string,
+        public orderType: string) {}
 }
 
 export interface ReplaceRequestFromUI {
-    price : number;
-    quantity : number;
+    price: number;
+    quantity: number;
 }
 
 export class FairValue implements ITimestamped {
@@ -260,7 +260,7 @@ export enum QuoteSent { First, Modify, UnsentDuplicate, Delete, UnsentDelete, Un
 
 export class Quote {
     constructor(public price: number,
-                public size: number) {}
+        public size: number) {}
 }
 
 export class TwoSidedQuote implements ITimestamped {
@@ -295,21 +295,21 @@ export enum AutoPositionMode { Off, EwmaBasic }
 
 export class QuotingParameters {
     constructor(public width: number,
-                public size: number,
-                public mode: QuotingMode,
-                public fvModel: FairValueModel,
-                public targetBasePosition: number,
-                public positionDivergence: number,
-                public ewmaProtection: boolean,
-                public autoPositionMode: AutoPositionMode,
-                public aggressivePositionRebalancing: boolean,
-                public tradesPerMinute: number,
-                public tradeRateSeconds: number,
-                public longEwma: number,
-                public shortEwma: number,
-                public quotingEwma: number,
-                public aprMultiplier: number,
-                public stepOverSize: number) {}
+        public size: number,
+        public mode: QuotingMode,
+        public fvModel: FairValueModel,
+        public targetBasePosition: number,
+        public positionDivergence: number,
+        public ewmaProtection: boolean,
+        public autoPositionMode: AutoPositionMode,
+        public aggressivePositionRebalancing: boolean,
+        public tradesPerMinute: number,
+        public tradeRateSeconds: number,
+        public longEwma: number,
+        public shortEwma: number,
+        public quotingEwma: number,
+        public aprMultiplier: number,
+        public stepOverSize: number) {}
 }
 
 export function toUtcFormattedTime(t: moment.Moment | Date) {
@@ -342,11 +342,11 @@ export class RegularFairValue {
 
 export class TradeSafety {
     constructor(public buy: number,
-                public sell: number,
-                public combined: number,
-                public buyPing: number,
-                public sellPong: number,
-                public time: Date) {}
+        public sell: number,
+        public combined: number,
+        public buyPing: number,
+        public sellPong: number,
+        public time: Date) {}
 }
 
 export class TargetBasePositionValue {

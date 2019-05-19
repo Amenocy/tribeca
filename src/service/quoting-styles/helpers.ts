@@ -1,4 +1,3 @@
-/// <reference path="../../common/models.ts" />
 
 import Models = require("../../common/models");
 
@@ -16,6 +15,6 @@ export class QuoteInput {
 }
 
 export interface QuoteStyle {
-    Mode : Models.QuotingMode;
-    GenerateQuote(input: QuoteInput) : GeneratedQuote;
+    Mode: Models.QuotingMode;
+    GenerateQuote(input: QuoteInput): GeneratedQuote;
 }

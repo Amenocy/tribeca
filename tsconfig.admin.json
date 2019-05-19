@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "rootDir": "src/admin",
+        "sourceMap": true,
+        "removeComments": false,
+        "declaration": false,
+        "outDir": "tribeca/service/admin/js",
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

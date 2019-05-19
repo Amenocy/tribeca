@@ -1,20 +1,26 @@
-import bunyan = require("bunyan");
+import * as winston from 'winston';
 import * as _ from "lodash";
 
-export default function log(name: string) : bunyan {
+const { combine, timestamp, label, prettyPrint } = winston.format;
+
+const logger = (name: string, level?: string) => winston.createLogger({
+    format: combine(
+        label({ label: name }),
+        timestamp(),
+        prettyPrint()
+    ),
+    transports: [
+        new winston.transports.Console({ level: level || 'info'})
+    ]
+});
+
+
+export default function log(name: string): winston.Logger {
     // don't log while testing
     const isRunFromMocha = process.argv.length >= 2 && _.includes(process.argv[1], "mocha");
     if (isRunFromMocha) {
-        return bunyan.createLogger({name: name, stream: process.stdout, level: bunyan.FATAL});
+        return logger(name, 'crit');
     }
 
-    let level = "info";
-    if (_.includes(process.argv, "debug")) {
-        level = "debug";
-    }
-
-    return bunyan.createLogger({
-        name: name,
-        streams: [{ level: level, stream: process.stdout }]
-    });
+    return logger(name, _.includes(process.argv, "debug") ? 'debug' : null)
 }

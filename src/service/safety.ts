@@ -1,9 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="config.ts" />
-/// <reference path="utils.ts" />
-/// <reference path="broker.ts" />
-/// <reference path="../common/messaging.ts" />
-///<reference path="persister.ts"/>
 
 import Models = require("../common/models");
 import Utils = require("./utils");
@@ -78,17 +72,17 @@ export class SafetyCalculator {
         var _buyPq = 0;
         var _sellPq = 0;
         for (var ti = this._broker._trades.length - 1; ti > -1; ti--) {
-          if (this._broker._trades[ti].side == Models.Side.Bid && buyPq<settings.size) {
-            _buyPq = Math.min(settings.size - buyPq, this._broker._trades[ti].quantity);
-            buyPing += this._broker._trades[ti].price * _buyPq;
-            buyPq += _buyPq;
-          }
-          if (this._broker._trades[ti].side == Models.Side.Ask && sellPq<settings.size) {
-            _sellPq = Math.min(settings.size - sellPq, this._broker._trades[ti].quantity);
-            sellPong += this._broker._trades[ti].price * _sellPq;
-            sellPq += _sellPq;
-          }
-          if (buyPq>=settings.size && sellPq>=settings.size) break;
+            if (this._broker._trades[ti].side == Models.Side.Bid && buyPq<settings.size) {
+                _buyPq = Math.min(settings.size - buyPq, this._broker._trades[ti].quantity);
+                buyPing += this._broker._trades[ti].price * _buyPq;
+                buyPq += _buyPq;
+            }
+            if (this._broker._trades[ti].side == Models.Side.Ask && sellPq<settings.size) {
+                _sellPq = Math.min(settings.size - sellPq, this._broker._trades[ti].quantity);
+                sellPong += this._broker._trades[ti].price * _sellPq;
+                sellPq += _sellPq;
+            }
+            if (buyPq>=settings.size && sellPq>=settings.size) break;
         }
 
         if (buyPq) buyPing /= buyPq;

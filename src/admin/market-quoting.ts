@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="shared_directives.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -32,11 +29,11 @@ interface MarketQuotingScope extends ng.IScope {
 }
 
 var MarketQuotingController = ($scope: MarketQuotingScope,
-        $log: ng.ILogService,
-        subscriberFactory: Shared.SubscriberFactory,
-        product: Shared.ProductState) => {
+    $log: ng.ILogService,
+    subscriberFactory: Shared.SubscriberFactory,
+    product: Shared.ProductState) => {
 
-    var toPrice = (px: number) : string => px.toFixed(product.fixed);
+    var toPrice = (px: number): string => px.toFixed(product.fixed);
     var toPercent = (askPx: number, bidPx: number): string => ((askPx - bidPx) / askPx * 100).toFixed(2);
 
     var clearMarket = () => {

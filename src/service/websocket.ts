@@ -1,24 +1,24 @@
 import * as ws from "ws";
 import * as Models from "../common/models";
-import * as bunyan from "bunyan";
+import * as winston from "winston";
 import log from "./logging";
 
 export default class WebSocket {
-    private readonly _log : bunyan;
-    private _ws : ws = null;
+    private readonly _log: winston.Logger;
+    private _ws: ws = null;
 
     constructor(private _url: string, 
-                private _reconnectInterval = 5000,
-                private _onData: (msgs : Models.Timestamped<string>) => void = null,
-                private _onConnected: () => void = null, 
-                private _onDisconnected: () => void = null) {
+        private _reconnectInterval = 5000,
+        private _onData: (msgs: Models.Timestamped<string>) => void = null,
+        private _onConnected: () => void = null, 
+        private _onDisconnected: () => void = null) {
         this._log = log(`ws:${this._url}`);
         this._onData = this._onData || (_ => {});
         this._onConnected = this._onConnected || (() => {});
         this._onDisconnected = this._onDisconnected || (() => {});
     }
 
-    public get isConnected() : boolean { return this._ws.readyState === ws.OPEN; }    
+    public get isConnected(): boolean { return this._ws.readyState === ws.OPEN; }    
 
     public connect = () => {
         if (this._ws !== null) return;
@@ -89,11 +89,11 @@ export default class WebSocket {
         if (this._ws !== null) {
             this._ws.send(data, (e: Error) => { 
                 if (!e && callback) callback();
-                else if (e) this._log.error(e, "error during websocket send!");
+                else if (e) this._log.error("error during websocket send!", e);
             });
         }
         else {
-            this._log.warn(data, "cannot send because socket is not connected!");
+            this._log.warn("cannot send because socket is not connected!", data);
         }
     }
 }

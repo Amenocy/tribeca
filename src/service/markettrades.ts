@@ -1,12 +1,3 @@
-/// <reference path="utils.ts" />
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="interfaces.ts"/>
-/// <reference path="persister.ts"/>
-/// <reference path="broker.ts"/>
-/// <reference path="web.ts"/>
-/// <reference path="quoting-engine.ts"/>
-
 import Models = require("../common/models");
 import Messaging = require("../common/messaging");
 import Utils = require("./utils");
@@ -26,7 +17,7 @@ export class MarketTradeBroker implements Interfaces.IMarketTradeBroker {
     public get marketTrades() { return this._marketTrades; }
 
     private _marketTrades: Models.MarketTrade[] = [];
-    private handleNewMarketTrade = (u: Models.GatewayMarketTrade) => {
+    private handleNewMarketTrade = (u: Models.GatewayMarketTrade): void => {
         const qt = u.onStartup ? null : this._quoteEngine.latestQuote;
         const mkt = u.onStartup ? null : this._mdBroker.currentBook;
 
@@ -65,7 +56,7 @@ export class MarketTradeBroker implements Interfaces.IMarketTradeBroker {
         private _quoteEngine: QuotingEngine.QuotingEngine,
         private _base: Broker.ExchangeBroker,
         private _persister: P.IPersist<Models.MarketTrade>,
-        initMkTrades: Array<Models.MarketTrade>) {
+        initMkTrades: Models.MarketTrade[]) {
             
         initMkTrades.forEach(t => this.marketTrades.push(t));
         this._log.info("loaded %d market trades", this.marketTrades.length);

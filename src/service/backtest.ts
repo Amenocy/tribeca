@@ -1,5 +1,3 @@
-/// <reference path="utils.ts" />
-/// <reference path="../common/models.ts" />
 
 import Models = require("../common/models");
 import Utils = require("./utils");
@@ -10,9 +8,7 @@ import fs = require("fs");
 import Persister = require("./persister");
 import Q = require("q");
 
-var shortId = require("shortid");
-var Deque = require("collections/deque");
-var uuid = require('uuid').uuidv4;
+import shortId from 'shortid';
 
 enum TimedType {
     Interval,
@@ -21,21 +17,21 @@ enum TimedType {
 
 class Timed {
     constructor(
-        public action : () => void, 
-        public time : moment.Moment, 
-        public type : TimedType,
-        public interval : moment.Duration) {}
+        public action: () => void, 
+        public time: moment.Moment, 
+        public type: TimedType,
+        public interval: moment.Duration) {}
 }
 
 export class BacktestTimeProvider implements Utils.IBacktestingTimeProvider {
-    constructor(private _internalTime : moment.Moment, private _endTime : moment.Moment) { }
+    constructor(private _internalTime: moment.Moment, private _endTime: moment.Moment) { }
     
     utcNow = () => this._internalTime.toDate();
     
     private _immediates = new Array<() => void>();
     setImmediate = (action: () => void) => this._immediates.push(action);
     
-    private _timeouts : Timed[] = [];
+    private _timeouts: Timed[] = [];
     setTimeout = (action: () => void, time: moment.Duration) => {
         this.setAction(action, time, TimedType.Timeout);
     };
@@ -44,7 +40,7 @@ export class BacktestTimeProvider implements Utils.IBacktestingTimeProvider {
         this.setAction(action, time, TimedType.Interval);
     };
     
-    private setAction  = (action: () => void, time: moment.Duration, type : TimedType) => {
+    private setAction  = (action: () => void, time: moment.Duration, type: TimedType) => {
         var dueTime = this._internalTime.clone().add(time);
         
         if (Utils.fastDiff(dueTime.toDate(), this.utcNow()) < 0) {
@@ -55,7 +51,7 @@ export class BacktestTimeProvider implements Utils.IBacktestingTimeProvider {
         this._timeouts.sort((a, b) => Utils.fastDiff(a.time.toDate(), b.time.toDate()));
     };
     
-    scrollTimeTo = (time : moment.Moment) => {
+    scrollTimeTo = (time: moment.Moment) => {
         if (Utils.fastDiff(time.toDate(), this.utcNow()) < 0) {
             throw new Error("Cannot reverse time!");
         }
@@ -65,7 +61,7 @@ export class BacktestTimeProvider implements Utils.IBacktestingTimeProvider {
         }
         
         while (this._timeouts.length > 0 && Utils.fastDiff(_.first(this._timeouts).time.toDate(), time.toDate()) < 0) {
-            var evt : Timed = this._timeouts.shift();
+            var evt: Timed = this._timeouts.shift();
             this._internalTime = evt.time;
             evt.action();
             if (evt.type === TimedType.Interval) {
@@ -85,8 +81,8 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
     
     OrderUpdate = new Utils.Evt<Models.OrderStatusUpdate>();
     
-    supportsCancelAllOpenOrders = () : boolean => { return false; };
-    cancelAllOpenOrders = () : Q.Promise<number> => { return Q(0); };
+    supportsCancelAllOpenOrders = (): boolean => { return false; };
+    cancelAllOpenOrders = (): Q.Promise<number> => { return Q(0); };
     
     generateClientOrderId = () => {
         return "BACKTEST-" + shortId.generate();
@@ -94,10 +90,10 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
 
     public cancelsByClientOrderId = true;
     
-    private _openBidOrders : {[orderId: string]: Models.OrderStatusReport} = {};
-    private _openAskOrders : {[orderId: string]: Models.OrderStatusReport} = {};
+    private _openBidOrders: {[orderId: string]: Models.OrderStatusReport} = {};
+    private _openAskOrders: {[orderId: string]: Models.OrderStatusReport} = {};
 
-    sendOrder = (order : Models.OrderStatusReport) => {
+    sendOrder = (order: Models.OrderStatusReport) => {
         this.timeProvider.setTimeout(() => {
             if (order.side === Models.Side.Bid) {
                 this._openBidOrders[order.orderId] = order;
@@ -114,7 +110,7 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
         }, moment.duration(3));
     };
 
-    cancelOrder = (cancel : Models.OrderStatusReport) => {
+    cancelOrder = (cancel: Models.OrderStatusReport) => {
         this.timeProvider.setTimeout(() => {
             if (cancel.side === Models.Side.Bid) {
                 var existing = this._openBidOrders[cancel.orderId];
@@ -141,12 +137,12 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
         }, moment.duration(3));
     };
 
-    replaceOrder = (replace : Models.OrderStatusReport) => {
+    replaceOrder = (replace: Models.OrderStatusReport) => {
         this.cancelOrder(replace);
         this.sendOrder(replace);
     };
     
-    private onMarketData = (market : Models.Market) => {
+    private onMarketData = (market: Models.Market) => {
         this._openAskOrders = this.tryToMatch(<any>_.values(this._openAskOrders), market.bids, Models.Side.Ask);
         this._openBidOrders = this.tryToMatch(<any>_.values(this._openBidOrders), market.asks, Models.Side.Bid);
         
@@ -165,7 +161,7 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
                     var px = order.price;
                     if (order.type === Models.OrderType.Market) px = mkt.price;
                     
-                    var update : Models.OrderStatusUpdate = { orderId: order.orderId, lastPrice: px };
+                    var update: Models.OrderStatusUpdate = { orderId: order.orderId, lastPrice: px };
                     if (mkt.size >= order.quantity) {
                         update.orderStatus = Models.OrderStatus.Complete;
                         update.lastQuantity = order.quantity;
@@ -199,7 +195,7 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
         return _.keyBy(liveOrders, k => k.orderId);
     };
     
-    private onMarketTrade = (trade : Models.MarketTrade) => {
+    private onMarketTrade = (trade: Models.MarketTrade) => {
         this._openAskOrders = this.tryToMatch(<any>_.values(this._openAskOrders), [trade], Models.Side.Ask);
         this._openBidOrders = this.tryToMatch(<any>_.values(this._openBidOrders), [trade], Models.Side.Bid);
         
@@ -216,10 +212,10 @@ export class BacktestGateway implements Interfaces.IPositionGateway, Interfaces.
     private _quoteHeld = 0;
     
     constructor(
-            private _inputData: Array<Models.Market | Models.MarketTrade>,
-            private _baseAmount : number,
-            private _quoteAmount : number,
-            private timeProvider: Utils.IBacktestingTimeProvider) {}
+        private _inputData: (Models.Market | Models.MarketTrade)[],
+        private _baseAmount: number,
+        private _quoteAmount: number,
+        private timeProvider: Utils.IBacktestingTimeProvider) {}
     
     public run = () => {
         this.ConnectChanged.trigger(Models.ConnectivityStatus.Connected);
@@ -338,7 +334,7 @@ var backtestServer = () => {
     var backtestResultFile = process.env["RESULT_FILE"] || 'backtestResults.txt';
     
     var rawParams = fs.readFileSync(paramFile, 'utf8');
-    var parameters : BacktestParameters[] = JSON.parse(rawParams);
+    var parameters: BacktestParameters[] = JSON.parse(rawParams);
     if (fs.existsSync(savedProgressFile)) {
         var l = parseInt(fs.readFileSync(savedProgressFile, 'utf8'));
         parameters = _.takeRight(parameters, l);

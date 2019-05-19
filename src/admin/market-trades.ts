@@ -1,6 +1,3 @@
-/// <reference path="../common/models.ts" />
-/// <reference path="../common/messaging.ts" />
-/// <reference path="shared_directives.ts"/>
 
 import angular = require("angular");
 import Models = require("../common/models");
@@ -58,13 +55,13 @@ class MarketTradeViewModel {
 
 interface MarketTradeScope extends ng.IScope {
     marketTrades: MarketTradeViewModel[];
-    marketTradeOptions: Object;
+    marketTradeOptions: Record<string, any>;
 }
 
 var MarketTradeGrid = ($scope: MarketTradeScope,
-                       $log: ng.ILogService,
-                       subscriberFactory: Shared.SubscriberFactory,
-                       uiGridConstants: any) => {
+    $log: ng.ILogService,
+    subscriberFactory: Shared.SubscriberFactory,
+    uiGridConstants: any) => {
     $scope.marketTrades = [];
     $scope.marketTradeOptions = {
         data: 'marketTrades',
